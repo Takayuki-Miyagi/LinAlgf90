@@ -5,13 +5,9 @@ module LinearAlgebra
     real(8), allocatable :: V(:)
   contains
     procedure :: Ini => iniV, Fin => FinV
-    procedure :: InnerProduct   ! .x.   c = a .x. b  (a, b: Vector, c: real)
-    procedure :: VectorSum      !  +    c = a  +  b  (a, b: Matrix)
-    procedure :: VectorScale    !  *    c = a  *  b  (a: Matrix, b: scalar)
-    procedure :: VectorSubtract !  -    c = a  -  b  (a, b: Matrix)
-    procedure :: VectorCopy     !  =    b = a        (a: Matrix)
     procedure :: prt => VectorPrint
     procedure :: GetRandomVector
+    procedure :: DVec => DiagMatVec
   end type VO
 
   type :: MO
@@ -26,19 +22,12 @@ module LinearAlgebra
     procedure :: Det
     procedure :: GetRandomMatrix
     procedure :: prt => MatrixPrint
-
-    procedure :: MatrixProduct ! .x.   c = a .x. b  (a, b: Matrix)
-    procedure :: MatrixSum     !  +    c = a  +  b  (a, b: Matrix)
-    procedure :: MatrixScale   !  *    c = a  *  b  (a: Matrix, b: scalar)
-    procedure :: MatrixSubtract!  -    c = a  -  b  (a, b: Matrix)
-    procedure :: MatrixCopy    !  =    b = a        (a: Matrix)
+    procedure :: DMat => VecDiagMat
   end type MO
 
   interface assignment(=)
     procedure :: VectorCopy
     procedure :: MatrixCopy
-    procedure :: VecDiagMat
-    procedure :: DiagMatVec
   end interface assignment(=)
 
   interface operator(+)
@@ -52,8 +41,10 @@ module LinearAlgebra
   end interface operator(-)
 
   interface operator(*)
-    procedure :: VectorScale
-    procedure :: MatrixScale
+    procedure :: VectorScaleR
+    procedure :: VectorScaleL
+    procedure :: MatrixScaleR
+    procedure :: MatrixScaleL
     procedure :: InnerProduct
   end interface operator(*)
 
@@ -78,7 +69,7 @@ contains
   end subroutine FinV
 
   subroutine VectorCopy(b, a)
-  class(VO), intent(inout) :: b
+    type(VO), intent(inout) :: b
     type(VO), intent(in) :: a
     integer :: n
     n = size(a%V)
@@ -99,7 +90,7 @@ contains
   end function VectorSum
 
   type(VO) function VectorSubtract(a, b) result(c)
-  class(VO), intent(in) :: a, b
+    type(VO), intent(in) :: a, b
     integer :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in VectorSubtract'
@@ -110,17 +101,26 @@ contains
     c%v = a%v - b%v
   end function VectorSubtract
 
-  type(VO) function VectorScale(a, b) result(c)
-  class(VO), intent(in) :: a
+  type(VO) function VectorScaleR(a, b) result(c)
+    type(VO), intent(in) :: a
     real(8), intent(in) :: b
     integer :: n
     n = size(a%v)
     call c%ini(n)
     c%v = b * a%v
-  end function VectorScale
+  end function VectorScaleR
+
+  type(VO) function VectorScaleL(b, a) result(c)
+    type(VO), intent(in) :: a
+    real(8), intent(in) :: b
+    integer :: n
+    n = size(a%v)
+    call c%ini(n)
+    c%v = b * a%v
+  end function VectorScaleL
 
   real(8) function InnerProduct(a, b) result(c)
-  class(VO), intent(in) :: a, b
+    type(VO), intent(in) :: a, b
     integer :: n
     real(8) :: ddot
     if(size(a%v) /= size(b%v)) then
@@ -132,7 +132,7 @@ contains
   end function InnerProduct
 
   type(MO) function OuterProduct(a, b) result(c)
-  class(VO), intent(in) :: a, b
+    type(VO), intent(in) :: a, b
     integer :: n, m
     real(8) :: ddot
     n = size(a%v)
@@ -167,7 +167,7 @@ contains
   end subroutine FinM
 
   subroutine MatrixCopy(b, a)
-  class(MO), intent(inout) :: b
+    type(MO), intent(inout) :: b
     type(MO), intent(in) :: a
     integer :: m, n
     m = size(a%m, 1)
@@ -177,7 +177,7 @@ contains
   end subroutine MatrixCopy
 
   type(MO) function MatrixProduct(a, b) result(c)
-  class(MO), intent(in) :: a, b
+    type(MO), intent(in) :: a, b
     integer :: m, k, n
     m = size(a%m, 1)
     k = size(a%m, 2)
@@ -267,7 +267,7 @@ contains
     c%m = a%m - b%m
   end function MatrixSubtract
 
-  type(MO) function MatrixScale(b, a) result(c)
+  type(MO) function MatrixScaleL(b, a) result(c)
   class(MO), intent(in) :: b
     real(8), intent(in) :: a
     integer :: m, n
@@ -275,7 +275,17 @@ contains
     n = size(b%m, 2)
     call c%Ini(m,n)
     c%m(:,:) = a * b%m(:,:)
-  end function MatrixScale
+  end function MatrixScaleL
+
+  type(MO) function MatrixScaleR(a, b) result(c)
+  class(MO), intent(in) :: b
+    real(8), intent(in) :: a
+    integer :: m, n
+    m = size(b%m, 1)
+    n = size(b%m, 2)
+    call c%Ini(m,n)
+    c%m(:,:) = a * b%m(:,:)
+  end function MatrixScaleR
 
   type(MO) function Transepose(a) result(b)
   class(MO), intent(in) :: a
@@ -283,11 +293,7 @@ contains
     m = size(a%m, 1)
     n = size(a%m, 2)
     call b%Ini(n,m)
-    do i = 1, n
-      do j = 1, m
-        b%M(i,j) = a%M(j,i)
-      end do
-    end do
+    b%M = transpose(a%M)
   end function Transepose
 
   subroutine DiagonalizationSymmetric(r, eval, evec, qmin, qmax, m, tol)
