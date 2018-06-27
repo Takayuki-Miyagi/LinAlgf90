@@ -9,7 +9,7 @@ contains
     n = size(a%v)
     m = size(b%v)
     call c%ini(n,m)
-    call zger(n, m, 1.d0, a%v, 1, b%v, 1, c%m, n)
+    call zgeru(n, m, 1.d0, a%v, 1, b%v, 1, c%m, n)
   end function OuterProductC
 
   type(CVec) function MVProductC(a, b) result(c)

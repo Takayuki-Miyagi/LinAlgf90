@@ -2,14 +2,12 @@
 # Make file for UMOA calculation
 #--------------------------------------------------
 COMPILER=GNU
-TARGET=LinAlg
+TARGET=test
 #--------------------------------------------------
 # for compile
 #--------------------------------------------------
 FDEP=makedepf90
-FC=gfortran -ff2c# -ff2c option is needed in complex dot product
-LIBS=-llapack -lblas
-# NOTE -ff2c option is needed in complex dot product
+FC=gfortran -lLinAlg.so
 
 OMP=-fopenmp
 FFLAGS=-O3 $(REAL4)

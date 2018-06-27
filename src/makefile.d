@@ -7,4 +7,3 @@
 ./VectorComplex.o : ./VectorComplex.f90 ./parameters.o 
 ./VectorDouble.o : ./VectorDouble.f90 ./parameters.o 
 ./parameters.o : ./parameters.f90 
-./test.o : ./test.f90 ./LinAlgLib.o ./MatrixComplex.o ./MatrixDouble.o ./VectorComplex.o ./VectorDouble.o 
