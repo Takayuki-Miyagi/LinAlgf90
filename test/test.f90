@@ -8,7 +8,7 @@ program test
   !call check_dvector()
   call check_dmatrix()
   !call check_zvector()
-  call check_zmatrix()
+  !call check_zmatrix()
 
 contains
   subroutine check_dvector()
@@ -37,16 +37,16 @@ contains
 
   subroutine check_dmatrix()
     type(DMat) :: a, b, c
+    type(EigenSolSymD) :: sol
     integer :: n = 2
     call a%Random(n,n)
     call b%Random(n,n)
-    a%m(1,:) = (/1.d0, 0.d0/)
-    a%m(2,:) = (/1.d0, 0.d0/)
-    c = a%T()
-    b = a * c
-    call a%prt()
-    call c%prt()
-    call b%prt()
+    c = a + a%T()
+    call sol%init(c)
+    call sol%DiagSym(c)
+    call sol%eig%prt()
+    call sol%vec%prt()
+    call sol%fin()
   end subroutine check_dmatrix
 
   subroutine check_zmatrix()

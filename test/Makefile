@@ -6,8 +6,11 @@ TARGET=test
 #--------------------------------------------------
 # for compile
 #--------------------------------------------------
+LIBRARY_PATH=-L../lib/
+INCLUDE_PATH=-I../include/
 FDEP=makedepf90
-FC=gfortran -lLinAlg.so
+FC=gfortran
+LIBS=-lLinAlg
 
 OMP=-fopenmp
 FFLAGS=-O3 $(REAL4)
@@ -38,12 +41,11 @@ OBJS = $(OBJC) $(OBJF77) $(OBJF90) $(OBJF95)
 #--------------------------------------------------
 all: $(TARGET)
 $(TARGET): $(OBJS)
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -shared -fPIC -o $(TARGET).so $^ $(LIBS)
-
+	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $(TARGET).exe $^ $(LIBRARY_PATH) $(INCLUDE_PATH) $(LIBS)
 $(OBJDIR)/%.o:$(SRCDIR)/%.F90
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $<
 $(OBJDIR)/%.o:$(SRCDIR)/%.f90
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $<
+	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $< $(LIBRARY_PATH) $(INCLUDE_PATH) $(LIBS)
 $(OBJDIR)/%.o:$(SRCDIR)/%.f
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $<
 $(OBJDIR)/%.o:$(SRCDIR)/%.c

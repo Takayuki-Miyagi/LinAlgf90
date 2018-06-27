@@ -66,9 +66,27 @@ module LinAlgLib
     type(DVec) :: eig
     type(DMat) :: vec
   contains
+    procedure :: init
+    procedure :: fin
     procedure :: DiagSym
   end type EigenSolSymD
 contains
+
+  subroutine init(this, A)
+  class(EigenSolSymD) :: this
+    type(DMat), intent(in) :: A
+    integer :: n
+    n = size(A%m)
+    call this%eig%ini(n)
+    call this%vec%ini(n,n)
+  end subroutine init
+
+  subroutine fin(this)
+  class(EigenSolSymD) :: this
+    call this%eig%fin()
+    call this%vec%fin()
+  end subroutine fin
+
   subroutine DiagSym(this, A, qmin, qmax, m)
     use parameters, only: eps
   class(EigenSolSymD) :: this

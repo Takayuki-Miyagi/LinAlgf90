@@ -2,12 +2,12 @@
 # Make file for UMOA calculation
 #--------------------------------------------------
 COMPILER=GNU
-TARGET=LinAlg
+TARGET=libLinAlg
 #--------------------------------------------------
 # for compile
 #--------------------------------------------------
 FDEP=makedepf90
-FC=gfortran -ff2c# -ff2c option is needed in complex dot product
+FC=gfortran -ff2c -fPIC # -ff2c option is needed in complex dot product
 LIBS=-llapack -lblas
 # NOTE -ff2c option is needed in complex dot product
 
@@ -40,7 +40,11 @@ OBJS = $(OBJC) $(OBJF77) $(OBJF90) $(OBJF95)
 #--------------------------------------------------
 all: $(TARGET)
 $(TARGET): $(OBJS)
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -shared -fPIC -o $(TARGET).so $^ $(LIBS)
+	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -shared -o $(TARGET).so $^ $(LIBS)
+	@echo '**********************************************************************'
+	@echo '* Make sure libLinAlg.so is in your LIBRARY_PATH and LD_LIBRARY_PATH *'
+	@echo '**********************************************************************'
+
 
 $(OBJDIR)/%.o:$(SRCDIR)/%.F90
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $<
@@ -55,7 +59,7 @@ dep:
 	$(FDEP) $(SRCS) -b $(OBJDIR)/ > $(DEPDIR)/makefile.d
 
 clean:
-	rm -f $(TARGET).exe
+	rm -f $(TARGET).so
 	rm -f *.mod *.o
 
 #--------------------------------------------------
