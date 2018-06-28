@@ -6,14 +6,13 @@ TARGET=test
 #--------------------------------------------------
 # for compile
 #--------------------------------------------------
-LIBRARY_PATH=-L../lib/
-INCLUDE_PATH=-I../include/
+#LIBRARY_PATH=-L../lib/
+INCLUDE_PATH=-I/Users/miyagi/LinAlgLib
 FDEP=makedepf90
 FC=gfortran
 LIBS=-lLinAlg
 
 OMP=-fopenmp
-FFLAGS=-O3 $(REAL4)
 FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -Ddebug
 
 
@@ -22,16 +21,12 @@ FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -Ddebug
 #--------------------------------------------------
 SRCDIR = .
 DEPDIR = .
-SRCC    = $(wildcard $(SRCDIR)/*.c)
-SRCF77 += $(wildcard $(SRCDIR)/*.f)
 SRCF90 += $(wildcard $(SRCDIR)/*.f90)
 SRCF95 += $(wildcard $(SRCDIR)/*.F90)
-DEPC = $(SRCC:$(SRCDIR/%.c=$(DEPDIR)/%.d)
+DEPC = $(SRCC:$(SRCDIR/%.c=$(DEPDIR)/%.d))
 SRCS = $(SRCC) $(SRCF77) $(SRCF90) $(SRCF95)
 
 OBJDIR = .
-OBJC    = $(SRCC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-OBJF77 += $(SRCF77:$(SRCDIR)/%.f=$(OBJDIR)/%.o)
 OBJF90 += $(SRCF90:$(SRCDIR)/%.f90=$(OBJDIR)/%.o)
 OBJF95 += $(SRCF95:$(SRCDIR)/%.F90=$(OBJDIR)/%.o)
 OBJS = $(OBJC) $(OBJF77) $(OBJF90) $(OBJF95)
@@ -41,15 +36,11 @@ OBJS = $(OBJC) $(OBJF77) $(OBJF90) $(OBJF95)
 #--------------------------------------------------
 all: $(TARGET)
 $(TARGET): $(OBJS)
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $(TARGET).exe $^ $(LIBRARY_PATH) $(INCLUDE_PATH) $(LIBS)
+	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $(TARGET).exe $^
 $(OBJDIR)/%.o:$(SRCDIR)/%.F90
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $<
 $(OBJDIR)/%.o:$(SRCDIR)/%.f90
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $< $(LIBRARY_PATH) $(INCLUDE_PATH) $(LIBS)
-$(OBJDIR)/%.o:$(SRCDIR)/%.f
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $<
-$(OBJDIR)/%.o:$(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $@ -c $< $(INCLUDE_PATH) $(LIBS)
 
 dep:
 	$(FDEP) $(SRCS) -b $(OBJDIR)/ > $(DEPDIR)/makefile.d
