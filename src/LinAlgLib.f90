@@ -68,7 +68,8 @@ module LinAlgLib
   contains
     procedure :: init
     procedure :: fin
-    procedure :: DiagSym
+    procedure :: DiagSym ! eigen values and eigen vectors
+    procedure :: Eigenval! only eigen values
   end type EigenSolSymD
 contains
 
@@ -99,8 +100,6 @@ contains
     integer :: info, lwork, n
     real(8) :: lw, dlamch
     n = size(A%M, 1)
-    call this%eig%ini(n)
-    call this%vec%ini(n,n)
     this%vec = A
     if(.not. present(m) .and. .not. present(qmin) .and. &
       & .not. present(qmax)) then
@@ -128,77 +127,28 @@ contains
     end if
   end subroutine DiagSym
 
-!  subroutine DiagonalizationSymmetric(r, eval, evec, qmin, qmax, m, tol)
-!  class(MO), intent(in) :: r
-!    type(Vec), intent(out) :: eval
-!    type(MO), intent(out) :: evec
-!    real(8), optional, intent(in) :: qmin, qmax, tol
-!    integer, optional, intent(in) :: m
-!    integer :: num
-!    real(8), allocatable :: work(:), mat(:,:), eig(:)
-!    integer, allocatable :: iwork(:), ifailv(:)
-!    integer :: info, lwork, n, i
-!    real(8) :: lw, dlamch
-!
-!    n = size(r%M, 1)
-!    call eval%Ini(n)
-!    call evec%Ini(n,n)
-!    allocate(eig(n)); eig(:) = 0.d0
-!
-!    if(.not. present(m) .and. .not. present(qmin) .and. &
-!      & .not. present(qmax) .and. .not. present(tol)) then
-!      allocate(mat(n,n))
-!      mat = r%m
-!      call dsyev('v', 'u', n, mat, n, eig, lw, -1, info)
-!      lwork = int(lw)
-!      allocate(work(lwork))
-!      call dsyev('v', 'u', n, mat, n, eig, work, lwork, info)
-!      evec%m = mat
-!      deallocate(mat)
-!    elseif(present(m)) then
-!      allocate(iwork(5*n), ifailv(n))
-!      call dsyevx('v','i','u',n,r%m,n,-1.d100,1.d100,1,n,dlamch('S'), &
-!        &  num,eig,evec%m,n,lw,-1,iwork,ifailv,info)
-!      deallocate( iwork, ifailv)
-!    else
-!      allocate(iwork(5*n), ifailv(n))
-!      call dsyevx('v','i','u',n,r%m,n,-1.d100,1.d100,1,n,dlamch('S'), &
-!        &  num,eig,evec%m,n,lw,-1,iwork,ifailv,info)
-!      lwork = int(lw)
-!      allocate(work(1:lwork))
-!      call dsyevx('v','v','u',n,r%m,n,qmin,qmax,1,n,tol, &
-!        &  num,eig,evec%m,n,work,lwork,iwork,ifailv,info)
-!      deallocate( iwork, ifailv)
-!    end if
-!    eval%v = eig
-!    deallocate(eig)
-!  end subroutine DiagonalizationSymmetric
-!
-!  subroutine EigenValuesSymmetric(r, eval, m)
-!  class(MO), intent(inout) :: r
-!    type(Vec), intent(out) :: eval
-!    integer, intent(in) :: m
-!    integer, allocatable :: iwork(:), iblock(:), isplit(:)
-!    real(8), allocatable :: work(:), mat(:,:), d(:), e(:), tau(:), w(:)
-!    real(8) :: dlamch, lw
-!    integer :: n, info, lwork, nsplit, i
-!    n = size(r%m)
-!    call eval%Ini(n)
-!    allocate(mat(n,n))
-!    allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
-!    allocate(iblock(n), isplit(n))
-!    mat = r%m
-!    call dsytrd('u',n,mat,n,d,e,tau,lw,-1,info)
-!    lwork = int(lw)
-!    allocate(work(lwork))
-!    call dsytrd('u',n,mat,n,d,e,tau,work,lwork,info)
-!    call dstebz('i','e',n,0.d0,0.d0,1,min(n,m),dlamch('S'), &
-!      & d, e, m, nsplit, w, iblock, isplit, work, iwork, info)
-!    do i = 1, min(n,m)
-!      eval%v(i) = w(i)
-!    end do
-!    deallocate(work)
-!    deallocate(mat, d, e, tau,iblock, isplit)
-!  end subroutine EigenValuesSymmetric
+  subroutine Eigenval(this, A, m)
+  class(EigenSolSymD) :: this
+    type(DMat), intent(in) :: A
+    integer, intent(in) :: m
+    integer, allocatable :: iwork(:), iblock(:), isplit(:)
+    real(8), allocatable :: work(:), d(:), e(:), tau(:), w(:)
+    real(8) :: dlamch, lw
+    integer :: n, info, lwork, nsplit, i
 
+    n = size(A%M, 1)
+    allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
+    allocate(iblock(n), isplit(n))
+    call dsytrd('u',n,A%m,n,d,e,tau,lw,-1,info)
+    lwork = int(lw)
+    allocate(work(lwork))
+    call dsytrd('u',n,A%m,n,d,e,tau,work,lwork,info)
+    call dstebz('i','e',n,0.d0,0.d0,1,min(n,m),dlamch('S'), &
+      & d, e, m, nsplit, w, iblock, isplit, work, iwork, info)
+    do i = 1, min(n,m)
+      this%eig%v(i) = w(i)
+    end do
+    deallocate(work)
+    deallocate(d, e, tau,iblock, isplit)
+  end subroutine Eigenval
 end module LinAlgLib

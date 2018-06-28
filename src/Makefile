@@ -41,6 +41,8 @@ OBJS = $(OBJC) $(OBJF77) $(OBJF90) $(OBJF95)
 all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -shared -o $(TARGET).so $^ $(LIBS)
+	cp $(TARGET).so ../lib/
+	cp *.mod ../include/
 	@echo '**********************************************************************'
 	@echo '* Make sure libLinAlg.so is in your LIBRARY_PATH and LD_LIBRARY_PATH *'
 	@echo '**********************************************************************'
