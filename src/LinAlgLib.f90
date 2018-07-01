@@ -62,6 +62,11 @@ module LinAlgLib
     procedure :: OuterProductC
   end interface operator(.x.)
 
+  interface exp
+    procedure :: ExpD
+    procedure :: ExpC
+  end interface exp
+
   type :: EigenSolSymD
     type(DVec) :: eig
     type(DMat) :: vec
@@ -151,4 +156,34 @@ contains
     deallocate(work)
     deallocate(d, e, tau,iblock, isplit)
   end subroutine Eigenval
+
+  type(DMat) function ExpD(a, ord) result(r)
+    type(DMat), intent(in) :: a
+    type(DMat) :: b
+    integer, intent(in), optional :: ord
+    integer :: i
+    integer :: iord = 12
+    if(present(ord)) iord = ord
+    call r%eye(size(a%m, 1))
+    b = r
+    do i = 1, iord
+      b = b * a / dble(i)
+      r = r + b
+    end do
+  end function ExpD
+
+  type(CMat) function ExpC(a, ord) result(r)
+    type(CMat), intent(in) :: a
+    type(CMat) :: b
+    integer, intent(in), optional :: ord
+    integer :: i
+    integer :: iord = 12
+    if(present(ord)) iord = ord
+    call r%eye(size(a%m, 1))
+    b = r
+    do i = 1, iord
+      b = b * a / dble(i)
+      r = r + b
+    end do
+  end function ExpC
 end module LinAlgLib
