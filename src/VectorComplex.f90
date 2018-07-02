@@ -1,5 +1,5 @@
 module VectorComplex
-  use parameters
+  use LinAlgParameters
   implicit none
   type :: CVec
     complex(8), allocatable :: V(:)

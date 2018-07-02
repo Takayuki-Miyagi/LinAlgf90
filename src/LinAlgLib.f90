@@ -94,7 +94,7 @@ contains
   end subroutine fin
 
   subroutine DiagSym(this, A, qmin, qmax, m)
-    use parameters, only: eps
+    use LinAlgParameters, only: eps
   class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     real(8), intent(in), optional :: qmin, qmax

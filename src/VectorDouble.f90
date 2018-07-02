@@ -1,5 +1,5 @@
 module VectorDouble
-  use parameters
+  use LinAlgParameters
   implicit none
   type :: DVec
     real(8), allocatable :: V(:)
