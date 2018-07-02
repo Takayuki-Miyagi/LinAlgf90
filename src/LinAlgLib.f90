@@ -82,7 +82,7 @@ contains
   class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     integer :: n
-    n = size(A%m)
+    n = size(A%m, 1)
     call this%eig%ini(n)
     call this%vec%ini(n,n)
   end subroutine init
