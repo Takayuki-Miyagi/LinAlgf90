@@ -66,7 +66,7 @@ contains
   end function MatrixProductD
 
   type(DMat) function MatrixSumD(a, b) result(c)
-  class(DMat), intent(in) :: a, b
+    type(DMat), intent(in) :: a, b
     integer :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
@@ -81,7 +81,7 @@ contains
   end function MatrixSumD
 
   type(DMat) function MatrixSubtractD(a, b) result(c)
-  class(DMat), intent(in) :: a, b
+    type(DMat), intent(in) :: a, b
     integer :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
@@ -96,7 +96,7 @@ contains
   end function MatrixSubtractD
 
   type(DMat) function MatrixScaleLD(b, a) result(c)
-  class(DMat), intent(in) :: b
+    type(DMat), intent(in) :: b
     real(8), intent(in) :: a
     integer :: m, n, i
     m = size(b%m, 1)
@@ -109,7 +109,7 @@ contains
 
 
   type(DMat) function MatrixScaleRD(a, b) result(c)
-  class(DMat), intent(in) :: b
+    type(DMat), intent(in) :: b
     real(8), intent(in) :: a
     integer :: m, n, i
     m = size(b%m, 1)
@@ -121,7 +121,7 @@ contains
   end function MatrixScaleRD
 
   type(DMat) function MatrixScaleDivideD(b, a) result(c)
-  class(DMat), intent(in) :: b
+    type(DMat), intent(in) :: b
     real(8), intent(in) :: a
     integer :: m, n, i
     m = size(b%m, 1)
@@ -133,7 +133,7 @@ contains
   end function MatrixScaleDivideD
 
   type(DMat) function Transepose(a) result(b)
-  class(DMat), intent(in) :: a
+    class(DMat), intent(in) :: a
     integer :: n, m
     m = size(a%m, 1)
     n = size(a%m, 2)

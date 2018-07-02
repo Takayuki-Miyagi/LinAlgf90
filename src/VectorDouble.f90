@@ -35,7 +35,7 @@ contains
   end subroutine VectorCopyD
 
   type(DVec) function VectorSumD(a, b) result(c)
-  class(DVec), intent(in) :: a, b
+    type(DVec), intent(in) :: a, b
     integer :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in DVectorSum'

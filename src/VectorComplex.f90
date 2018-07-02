@@ -36,7 +36,7 @@ contains
   end subroutine VectorCopyC
 
   type(CVec) function VectorSumC(a, b) result(c)
-  class(CVec), intent(in) :: a, b
+    type(CVec), intent(in) :: a, b
     integer :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in DVectorSum'

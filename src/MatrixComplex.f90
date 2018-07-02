@@ -68,7 +68,7 @@ contains
   end function MatrixProductC
 
   type(CMat) function MatrixSumC(a, b) result(c)
-  class(CMat), intent(in) :: a, b
+    type(CMat), intent(in) :: a, b
     integer :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
@@ -83,7 +83,7 @@ contains
   end function MatrixSumC
 
   type(CMat) function MatrixSubtractC(a, b) result(c)
-  class(CMat), intent(in) :: a, b
+    type(CMat), intent(in) :: a, b
     integer :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
@@ -98,7 +98,7 @@ contains
   end function MatrixSubtractC
 
   type(CMat) function MatrixScaleLC(b, a) result(c)
-  class(CMat), intent(in) :: b
+    type(CMat), intent(in) :: b
     complex(8), intent(in) :: a
     integer :: m, n, i
     m = size(b%m, 1)
@@ -111,7 +111,7 @@ contains
 
 
   type(CMat) function MatrixScaleRC(a, b) result(c)
-  class(CMat), intent(in) :: b
+    type(CMat), intent(in) :: b
     complex(8), intent(in) :: a
     integer :: m, n, i
     m = size(b%m, 1)
@@ -123,7 +123,7 @@ contains
   end function MatrixScaleRC
 
   type(CMat) function MatrixScaleDivideC(b, a) result(c)
-  class(CMat), intent(in) :: b
+    type(CMat), intent(in) :: b
     real(8), intent(in) :: a
     integer :: m, n, i
     m = size(b%m, 1)
@@ -135,7 +135,7 @@ contains
   end function MatrixScaleDivideC
 
   type(CMat) function Trans(a) result(b)
-  class(CMat), intent(in) :: a
+    class(CMat), intent(in) :: a
     integer :: n, m
     m = size(a%m, 1)
     n = size(a%m, 2)
