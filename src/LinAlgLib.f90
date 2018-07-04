@@ -11,60 +11,59 @@ module LinAlgLib
   use MatVecComplex, only: OuterProductC, VMProductC, MVProductC
 
   interface assignment(=)
-    procedure :: VectorCopyD
-    procedure :: VectorCopyC
-    procedure :: MatrixCopyD
-    procedure :: MatrixCopyC
+    module procedure :: VectorCopyD, &
+      & VectorCopyC, &
+      & MatrixCopyD, &
+      & MatrixCopyC
   end interface assignment(=)
 
   interface operator(+)
-    procedure :: VectorSumD
-    procedure :: VectorSumC
-    procedure :: MatrixSumD
-    procedure :: MatrixSumC
+    module procedure :: VectorSumD, &
+      & VectorSumC, &
+      & MatrixSumD, &
+      & MatrixSumC
   end interface operator(+)
 
   interface operator(-)
-    procedure :: VectorSubtractD
-    procedure :: VectorSubtractC
-    procedure :: MatrixSubtractD
-    procedure :: MatrixSubtractC
+    module procedure :: VectorSubtractD, &
+      & VectorSubtractC, &
+      & MatrixSubtractD, &
+      & MatrixSubtractC
   end interface operator(-)
 
   interface operator(*)
-    procedure :: VectorScaleRD
-    procedure :: VectorScaleRC
-    procedure :: VectorScaleLD
-    procedure :: VectorScaleLC
-    procedure :: InnerProductD
-    procedure :: InnerProductC
-    procedure :: MatrixScaleLC
-    procedure :: MatrixScaleLD
-    procedure :: MatrixScaleRC
-    procedure :: MatrixScaleRD
-    procedure :: MatrixProductC
-    procedure :: MatrixProductD
-    procedure :: MVProductD
-    procedure :: VMProductD
-    procedure :: MVProductC
-    procedure :: VMProductC
+    module procedure :: VectorScaleRD, &
+      & VectorScaleRC, &
+      & VectorScaleLD, &
+      & VectorScaleLC, &
+      & InnerProductD, &
+      & InnerProductC, &
+      & MatrixScaleLC, &
+      & MatrixScaleLD, &
+      & MatrixScaleRC, &
+      & MatrixScaleRD, &
+      & MatrixProductC,&
+      & MatrixProductD,&
+      & MVProductD   , &
+      & VMProductD   , &
+      & MVProductC   , &
+      & VMProductC
   end interface operator(*)
 
   interface operator(/)
-    procedure :: VectorDivideD
-    procedure :: VectorDivideC
-    procedure :: MatrixScaleDivideD
-    procedure :: MatrixScaleDivideC
+    module procedure :: VectorDivideD, &
+      & VectorDivideC, &
+      & MatrixScaleDivideD, &
+      & MatrixScaleDivideC
   end interface operator(/)
 
   interface operator(.x.)
-    procedure :: OuterProductD
-    procedure :: OuterProductC
+    module procedure :: OuterProductD, &
+      & OuterProductC
   end interface operator(.x.)
 
   interface exp
-    procedure :: ExpD
-    procedure :: ExpC
+    module procedure :: ExpD, ExpC
   end interface exp
 
   type :: EigenSolSymD
