@@ -10,6 +10,17 @@ module LinAlgLib
   use MatVecDouble, only: OuterProductD, VMProductD, MVProductD
   use MatVecComplex, only: OuterProductC, VMProductC, MVProductC
 
+  private :: VectorCopyD, VectorCopyC, MatrixCopyD, MatrixCopyC, &
+    & VectorSumD, VectorSumC, MatrixSumD, MatrixSumC, &
+    & VectorSubtractD, VectorSubtractC, MatrixSubtractD, MatrixSubtractC, &
+    & VectorScaleRD, VectorScaleRC, VectorScaleLD, VectorScaleLC, InnerProductD, &
+    & InnerProductC, MatrixScaleLC, MatrixScaleLD, MatrixScaleRC, MatrixScaleRD, &
+    & MatrixProductC, MatrixProductD, MVProductD,  VMProductD, MVProductC, VMProductC, &
+    & VectorDivideD, VectorDivideC, MatrixScaleDivideD, MatrixScaleDivideC, &
+    & OuterProductD, OuterProductC
+  public :: assignment(=), operator(+), operator(-), operator(*), &
+    & operator(/), operator(.x.), EigenSolSymD
+
   interface assignment(=)
     module procedure :: VectorCopyD, &
       & VectorCopyC, &
