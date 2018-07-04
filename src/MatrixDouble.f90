@@ -1,12 +1,17 @@
 module MatrixDouble
   implicit none
+  private :: IniM, FinM, eye, Trans, Inverse, Det, &
+    & GetRandomMatrix, MatrixPrint, DiagMat
+  public :: DMat, MatrixCopyD, MatrixProductD, MatrixSumD, &
+    & MatrixSubtractD, MatrixScaleLD, MatrixScaleRD, &
+    & MatrixScaleDivideD
   type :: DMat
     real(8), allocatable :: M(:,:)
   contains
     procedure :: Ini => IniM
     procedure :: Fin => FinM
     procedure :: eye
-    procedure :: T => Transepose
+    procedure :: T => Trans
     procedure :: Inv => Inverse
     procedure :: Det
     procedure :: Random => GetRandomMatrix
@@ -132,14 +137,14 @@ contains
     end do
   end function MatrixScaleDivideD
 
-  type(DMat) function Transepose(a) result(b)
+  type(DMat) function Trans(a) result(b)
     class(DMat), intent(in) :: a
     integer :: n, m
     m = size(a%m, 1)
     n = size(a%m, 2)
     call b%Ini(n,m)
     b%M = transpose(a%M)
-  end function Transepose
+  end function Trans
 
   type(DMat) function inverse(r) result(s)
   class(DMat), intent(in) :: r

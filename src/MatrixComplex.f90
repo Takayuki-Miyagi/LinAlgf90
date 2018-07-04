@@ -1,5 +1,11 @@
 module MatrixComplex
   implicit none
+  private :: IniM, FinM, eye, Trans, ComplexConjugate, &
+    & HermiteConjugate, Inverse, Det, GetRandomMatrix, &
+    & MatrixPrint, DiagMat
+  public :: CMat, MatrixCopyC, MatrixProductC, MatrixSumC, &
+    & MatrixSubtractC, MatrixScaleLC, MatrixScaleRC, &
+    & MatrixScaleDivideC
   type :: CMat
     complex(8), allocatable :: M(:,:)
   contains

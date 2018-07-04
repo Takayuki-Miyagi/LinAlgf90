@@ -1,6 +1,9 @@
 module VectorDouble
   use LinAlgParameters
   implicit none
+  private :: IniV, FinV, VectorPrint, GetRandomVector, Nrm, Nrm2
+  public :: DVec, VectorCopyD, VectorSumD, VectorSubtractD, &
+    & VectorScaleRD, VectorScaleLD, VectorDivideD, InnerProductD
   type :: DVec
     real(8), allocatable :: V(:)
   contains

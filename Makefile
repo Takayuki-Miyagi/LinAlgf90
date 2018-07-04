@@ -26,7 +26,7 @@ SRCF95 += $(wildcard $(SRCDIR)/*.F90)
 DEPC = $(SRCC:$(SRCDIR/%.c=$(DEPDIR)/%.d))
 SRCS = $(SRCF90) $(SRCF95)
 
-MODDIR = include
+MODDIR = mod
 MODF90 += $(SRCF90:$(SRCDIR)/%.f90=$(MODDIR)/%.mod)
 MODF95 += $(SRCF95:$(SRCDIR)/%.F90=$(MODDIR)/%.mod)
 MODSUP = $(MODF90) $(MODF95)
@@ -41,7 +41,7 @@ OBJS = $(OBJF90) $(OBJF95)
 #--------------------------------------------------
 # Rules
 #--------------------------------------------------
-all: $(TARGET)
+all: dirs $(TARGET)
 $(TARGET): $(OBJS)
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -shared -o $(TARGET).so $^ $(LIBS)
 	if test -d $(INSTLDIR); then \
@@ -72,6 +72,19 @@ $(MODDIR)/%.mod:$(SRCDIR)/%.f90 $(OBJDIR)/%.o
 
 dep:
 	$(FDEP) $(SRCS) -b $(OBJDIR)/ > $(DEPDIR)/makefile.d
+
+dirs:
+	if test -d $(OBJDIR); then \
+		: ; \
+	else \
+		mkdir $(OBJDIR); \
+	fi
+	if test -d $(MODDIR); then \
+		: ; \
+	else \
+		mkdir $(MODDIR); \
+	fi
+
 
 clean:
 	rm -f $(TARGET).so

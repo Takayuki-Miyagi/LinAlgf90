@@ -2,6 +2,7 @@ module MatVecDouble
   use VectorDouble, only: DVec
   use MatrixDouble, only: DMat
   implicit none
+  public :: OuterProductD, MVProductD, VMProductD
 contains
   type(DMat) function OuterProductD(a, b) result(c)
     type(DVec), intent(in) :: a, b

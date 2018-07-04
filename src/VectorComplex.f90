@@ -1,6 +1,10 @@
 module VectorComplex
   use LinAlgParameters
   implicit none
+  private :: iniV, FinV, ComplexConjugate, VectorPrint, GetRandomVector, &
+    & Nrm, Nrm2
+  public :: CVec, VectorCopyC, VectorSumC, VectorSubtractC, VectorScaleRC, &
+    & VectorScaleLC, VectorDivideC, InnerProductC
   type :: CVec
     complex(8), allocatable :: V(:)
   contains

@@ -2,6 +2,7 @@ module MatVecComplex
   use VectorComplex, only: CVec
   use MatrixComplex, only: CMat
   implicit none
+  public :: OuterProductC, MVProductC, VMProductC
 contains
   type(CMat) function OuterProductC(a, b) result(c)
     type(CVec), intent(in) :: a, b
