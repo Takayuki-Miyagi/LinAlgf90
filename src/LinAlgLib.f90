@@ -17,7 +17,7 @@ module LinAlgLib
     & InnerProductC, MatrixScaleLC, MatrixScaleLD, MatrixScaleRC, MatrixScaleRD, &
     & MatrixProductC, MatrixProductD, MVProductD,  VMProductD, MVProductC, VMProductC, &
     & VectorDivideD, VectorDivideC, MatrixScaleDivideD, MatrixScaleDivideC, &
-    & OuterProductD, OuterProductC
+    & OuterProductD, OuterProductC, InitEigenSolSymD, FinEigenSolSymD, DiagSym, Eigenval
   public :: assignment(=), operator(+), operator(-), operator(*), &
     & operator(/), operator(.x.), EigenSolSymD
 
@@ -81,27 +81,27 @@ module LinAlgLib
     type(DVec) :: eig
     type(DMat) :: vec
   contains
-    procedure :: init
-    procedure :: fin
+    procedure :: init => InitEigenSolSymD
+    procedure :: fin => FinEigenSolSymD
     procedure :: DiagSym ! eigen values and eigen vectors
     procedure :: Eigenval! only eigen values
   end type EigenSolSymD
 contains
 
-  subroutine init(this, A)
+  subroutine InitEigenSolSymD(this, A)
   class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     integer :: n
     n = size(A%m, 1)
     call this%eig%ini(n)
     call this%vec%ini(n,n)
-  end subroutine init
+  end subroutine InitEigenSolSymD
 
-  subroutine fin(this)
+  subroutine FinEigenSolSymD(this)
   class(EigenSolSymD) :: this
     call this%eig%fin()
     call this%vec%fin()
-  end subroutine fin
+  end subroutine FinEigenSolSymD
 
   subroutine DiagSym(this, A, qmin, qmax, m)
     use LinAlgParameters, only: eps
