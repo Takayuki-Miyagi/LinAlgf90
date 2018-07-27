@@ -21,7 +21,8 @@ program test_EigenSolSymD
   a%m(:,4) = (/4.d0, 4.d0, 4.d0, 4.d0/)
 
   call sol%init(a)
-  call sol%DiagSym(a)
+  call sol%DiagSym(a) ! w/o error estimation
+  call sol%DiagSym(a, error=1) ! w/ error estimation
 
   call sol%eig%prt('Eigen Values')
   call sol%vec%prt('Eigen Vectors')

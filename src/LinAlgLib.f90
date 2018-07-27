@@ -9,7 +9,7 @@ module LinAlgLib
     & MatrixScaleRC, MatrixScaleLC, MatrixProductC, MatrixScaleDivideC
   use MatVecDouble, only: OuterProductD, VMProductD, MVProductD
   use MatVecComplex, only: OuterProductC, VMProductC, MVProductC
-
+  implicit none
   private :: VectorCopyD, VectorCopyC, MatrixCopyD, MatrixCopyC, &
     & VectorSumD, VectorSumC, MatrixSumD, MatrixSumC, &
     & VectorSubtractD, VectorSubtractC, MatrixSubtractD, MatrixSubtractC, &
@@ -89,7 +89,7 @@ module LinAlgLib
 contains
 
   subroutine InitEigenSolSymD(this, A)
-  class(EigenSolSymD) :: this
+    class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     integer :: n
     n = size(A%m, 1)
@@ -98,52 +98,67 @@ contains
   end subroutine InitEigenSolSymD
 
   subroutine FinEigenSolSymD(this)
-  class(EigenSolSymD) :: this
+    class(EigenSolSymD) :: this
     call this%eig%fin()
     call this%vec%fin()
   end subroutine FinEigenSolSymD
 
-  subroutine DiagSym(this, A, qmin, qmax, m)
+  subroutine DiagSym(this, A, qmin, qmax, m, error)
     use LinAlgParameters, only: eps
-  class(EigenSolSymD) :: this
+    class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     real(8), intent(in), optional :: qmin, qmax
     integer, intent(in), optional :: m
+    integer, intent(in), optional :: error
     integer :: num
-    real(8), allocatable :: work(:)
+    real(8), allocatable :: work(:), rcondz(:), zerrbd(:)
     integer, allocatable :: iwork(:), ifailv(:)
-    integer :: info, lwork, n
-    real(8) :: lw, dlamch
+    integer :: info, lwork, n, i
+    real(8) :: lw, dlamch, e, eerbd
     n = size(A%M, 1)
     this%vec = A
     if(.not. present(m) .and. .not. present(qmin) .and. &
-      & .not. present(qmax)) then
-      call dsyev('v', 'u', n, A%m, n, eig, lw, -1, info)
+        & .not. present(qmax)) then
+      call dsyev('v', 'u', n, A%m, n, this%eig%v, lw, -1, info)
       lwork = int(lw)
       allocate(work(lwork))
       call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, work, lwork, info)
       deallocate(work)
+      if(present(error)) then
+        allocate(rcondz(n), zerrbd(n))
+        e = epsilon(1.d0)
+        eerbd = e * max(abs(this%eig%v(1)), abs(this%eig%v(n)))
+        call ddisna('Eigenvectors', n, n, this%eig%v, rcondz, info)
+        do i = 1, n
+          zerrbd(i) = eerbd / rcondz(i)
+        end do
+        write(*,'(a)') 'Error estimate for eigen values'
+        write(*, '(1es12.4)') eerbd
+        write(*,'(a)') 'Error estimate for eigen vectors'
+        write(*, '(10es12.4)') zerrbd
+        deallocate(rcondz, zerrbd)
+      end if
 
     elseif(present(m)) then
       allocate(iwork(5*n), ifailv(n))
       call dsyevx('v', 'i', 'u', n, A%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
-        &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+          &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
       deallocate( iwork, ifailv)
 
     else
       allocate(iwork(5*n), ifailv(n))
       call dsyevx('v', 'i', 'u', n, A%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
-        &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+          &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
       lwork = int(lw)
       allocate(work(1:lwork))
       call dsyevx('v', 'v', 'u', n, A%m, n, qmin, qmax, 1, n, eps, &
-        &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
+          &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
       deallocate( iwork, ifailv)
     end if
   end subroutine DiagSym
 
   subroutine Eigenval(this, A, m)
-  class(EigenSolSymD) :: this
+    class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     integer, intent(in) :: m
     integer, allocatable :: iwork(:), iblock(:), isplit(:)
@@ -159,7 +174,7 @@ contains
     allocate(work(lwork))
     call dsytrd('u',n,A%m,n,d,e,tau,work,lwork,info)
     call dstebz('i','e',n,0.d0,0.d0,1,min(n,m),dlamch('S'), &
-      & d, e, m, nsplit, w, iblock, isplit, work, iwork, info)
+        & d, e, m, nsplit, w, iblock, isplit, work, iwork, info)
     do i = 1, min(n,m)
       this%eig%v(i) = w(i)
     end do
