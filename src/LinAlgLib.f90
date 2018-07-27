@@ -119,7 +119,7 @@ contains
     this%vec = A
     if(.not. present(m) .and. .not. present(qmin) .and. &
         & .not. present(qmax)) then
-      call dsyev('v', 'u', n, A%m, n, this%eig%v, lw, -1, info)
+      call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, lw, -1, info)
       lwork = int(lw)
       allocate(work(lwork))
       call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, work, lwork, info)
@@ -145,17 +145,17 @@ contains
 
     elseif(present(m)) then
       allocate(iwork(5*n), ifailv(n))
-      call dsyevx('v', 'i', 'u', n, A%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
+      call dsyevx('v', 'i', 'u', n, this%vec%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
           &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
       deallocate( iwork, ifailv)
 
     else
       allocate(iwork(5*n), ifailv(n))
-      call dsyevx('v', 'i', 'u', n, A%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
+      call dsyevx('v', 'i', 'u', n, this%vec%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
           &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
       lwork = int(lw)
       allocate(work(1:lwork))
-      call dsyevx('v', 'v', 'u', n, A%m, n, qmin, qmax, 1, n, eps, &
+      call dsyevx('v', 'v', 'u', n, this%vec%m, n, qmin, qmax, 1, n, eps, &
           &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
       deallocate( iwork, ifailv)
     end if
