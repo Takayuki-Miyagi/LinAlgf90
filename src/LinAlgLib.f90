@@ -123,6 +123,10 @@ contains
       lwork = int(lw)
       allocate(work(lwork))
       call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, work, lwork, info)
+      if(info /= 0) then
+        write(*,'(a, i6)') 'Error in DiagSym: info = ', info
+        stop
+      end if
       deallocate(work)
       if(present(error)) then
         allocate(rcondz(n), zerrbd(n))
