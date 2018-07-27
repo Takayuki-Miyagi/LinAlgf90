@@ -2,8 +2,8 @@
 # Make file for UMOA calculation
 #--------------------------------------------------
 COMPILER=GNU
-TARGET=libLinAlg
-INSTLDIR=~/LinAlgLib
+TARGET=test_libLinAlg
+INSTLDIR=./
 #--------------------------------------------------
 # for compile
 #--------------------------------------------------
@@ -19,56 +19,57 @@ FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -Ddebug # For debug
 #--------------------------------------------------
 # Source Files
 #--------------------------------------------------
+
+MAINDIR = test
+#SRCMAIN += $(MAINDIR)/test.f90
+SRCMAIN += $(MAINDIR)/test_EigenSolSymD.f90
+
+
 SRCDIR = src
 DEPDIR = .
 SRCF90 += $(wildcard $(SRCDIR)/*.f90)
 SRCF95 += $(wildcard $(SRCDIR)/*.F90)
-DEPC = $(SRCC:$(SRCDIR/%.c=$(DEPDIR)/%.d))
-SRCS = $(SRCF90) $(SRCF95)
+SRCS = $(SRCF90) $(SRCF95) $(MAINSRC)
 
 MODDIR = mod
-MODF90 += $(SRCF90:$(SRCDIR)/%.f90=$(MODDIR)/%.mod)
-MODF95 += $(SRCF95:$(SRCDIR)/%.F90=$(MODDIR)/%.mod)
-MODSUP = $(MODF90) $(MODF95)
-MODS = $(shell echo $(MODSUP) | tr A-Z a-z)
-#$(info $(MODS))
 
 OBJDIR = obj
 OBJF90 += $(SRCF90:$(SRCDIR)/%.f90=$(OBJDIR)/%.o)
 OBJF95 += $(SRCF95:$(SRCDIR)/%.F90=$(OBJDIR)/%.o)
-OBJS = $(OBJF90) $(OBJF95)
+OBJMAIN += $(SRCMAIN:$(MAINDIR)/%.f90=$(OBJDIR)/%.o)
+OBJS = $(OBJF90) $(OBJF95) $(OBJMAIN)
 
 #--------------------------------------------------
 # Rules
 #--------------------------------------------------
 all: dirs $(TARGET)
 $(TARGET): $(OBJS)
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -shared -o $(TARGET).so $^ $(LIBS)
+	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -o $(TARGET).exe $^ $(LIBS)
 	if test -d $(INSTLDIR); then \
 		: ; \
 	else \
 		mkdir -p $(INSTLDIR); \
 	fi
-	ln -sf $(PWD)/$(TARGET).so $(INSTLDIR)/$(TARGET).so
-	if test -d $(INSTLDIR)/$(MODDIR); then \
-		: ; \
+#	ln -sf $(PWD)/$(TARGET).so $(INSTLDIR)/$(TARGET).so
+#	if test -d $(INSTLDIR)/$(MODDIR); then \
+#		: ; \
 	else \
 		mkdir -p $(INSTLDIR)/$(MODDIR); \
 	fi
-	@for x in $(MODS); do \
-		echo linking $(PWD)/$$x '=>' $(INSTLDIR)/$$x; \
-		ln -sf $(PWD)/$$x $(INSTLDIR)/$$x; \
-	done
-	@echo '********************************************************************************'
-	@echo '* Make sure $(INSTRIDIR) is in your LIBRARY_PATH and LD_LIBRARY_PATH *'
-	@echo '********************************************************************************'
+#	@for x in $(MODS); do \
+#		echo linking $(PWD)/$$x '=>' $(INSTLDIR)/$$x; \
+#		ln -sf $(PWD)/$$x $(INSTLDIR)/$$x; \
+#	done
+#	@echo '********************************************************************************'
+#	@echo '* Make sure $(INSTRIDIR) is in your LIBRARY_PATH and LD_LIBRARY_PATH *'
+#	@echo '********************************************************************************'
 
 $(OBJDIR)/%.o:$(SRCDIR)/%.F90
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -J$(MODDIR) -o $@ -c $<
 $(OBJDIR)/%.o:$(SRCDIR)/%.f90
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -J$(MODDIR) -o $@ -c $<
-$(MODDIR)/%.mod:$(SRCDIR)/%.f90 $(OBJDIR)/%.o
-	@:
+$(OBJDIR)/%.o:$(SRCMAIN)
+	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -J$(MODDIR) -o $@ -c $<
 
 dep:
 	$(FDEP) $(SRCS) -b $(OBJDIR)/ > $(DEPDIR)/makefile.d
