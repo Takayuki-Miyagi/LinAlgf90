@@ -1,9 +1,13 @@
 module VectorDouble
   use LinAlgParameters
   implicit none
+
   private :: IniV, FinV, VectorPrint, GetRandomVector, Nrm, Nrm2
-  public :: DVec, VectorCopyD, VectorSumD, VectorSubtractD, &
-    & VectorScaleRD, VectorScaleLD, VectorDivideD, InnerProductD
+  private :: block_dvec
+
+  public :: DVec, VectorCopyD, VectorSumD, VectorSubtractD
+  public :: VectorScaleRD, VectorScaleLD, VectorDivideD, InnerProductD
+
   type :: DVec
     real(8), allocatable :: V(:)
   contains
@@ -11,6 +15,7 @@ module VectorDouble
     procedure :: Fin => FinV
     procedure :: prt => VectorPrint
     procedure :: Random => GetRandomVector
+    procedure :: blk => block_dvec
     procedure :: Nrm
     procedure :: Nrm2
   end type DVec
@@ -138,4 +143,14 @@ contains
     call v%ini(n)
     call dlarnv(idist, iseed, n, v%v)
   end subroutine GetRandomVector
+
+  function block_dvec(this, n1, n2) result(r)
+  class(DVec), intent(in) :: this
+    type(DVec) :: r
+    integer, intent(in) :: n1, n2
+    integer :: n
+    n = n2 - n1 + 1
+    call r%ini(n)
+    r%v(:) = this%v(n1:n2)
+  end function block_dvec
 end module VectorDouble

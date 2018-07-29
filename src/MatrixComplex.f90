@@ -1,11 +1,13 @@
 module MatrixComplex
   implicit none
-  private :: IniM, FinM, eye, Trans, ComplexConjugate, &
-    & HermiteConjugate, Inverse, Det, GetRandomMatrix, &
-    & MatrixPrint, DiagMat
-  public :: CMat, MatrixCopyC, MatrixProductC, MatrixSumC, &
-    & MatrixSubtractC, MatrixScaleLC, MatrixScaleRC, &
-    & MatrixScaleDivideC
+
+  private :: IniM, FinM, eye, Trans, ComplexConjugate
+  private :: HermiteConjugate, Inverse, Det, GetRandomMatrix
+  private :: MatrixPrint, DiagMat, block_cmat
+
+  public :: CMat, MatrixCopyC, MatrixProductC, MatrixSumC
+  public :: MatrixSubtractC, MatrixScaleLC, MatrixScaleRC
+  public :: MatrixScaleDivideC
   type :: CMat
     complex(8), allocatable :: M(:,:)
   contains
@@ -16,6 +18,7 @@ module MatrixComplex
     procedure :: C => ComplexConjugate
     procedure :: H => HermiteConjugate
     procedure :: Inv => Inverse
+    procedure :: blk => block_cmat
     procedure :: Det
     procedure :: Random => GetRandomMatrix
     procedure :: prt => MatrixPrint
@@ -225,6 +228,18 @@ contains
       write(*,cfmt) dimag(this%m(i,:))
     end do
   end subroutine MatrixPrint
+
+  function block_cmat(this, m1, m2, n1, n2) result(r)
+  class(CMat), intent(in) :: this
+    type(CMat) :: r
+    integer, intent(in) :: m1, m2, n1, n2
+    integer :: m, n
+    m = m2 - m1 + 1
+    n = n2 - n1 + 1
+    call r%ini(m,n)
+    r%m(:,:) = this%m(m1:m2,n1:n2)
+  end function block_cmat
+
 
   subroutine GetRandomMatrix(mat, m, n)
     use VectorComplex, only: CVec

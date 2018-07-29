@@ -18,5 +18,11 @@ program test
   write(*,'(a, f12.6)') 'Norm b = ', b%Nrm()
   write(*,'(a, f12.6)') 'Norm**2 a = ', a%Nrm2()
   write(*,'(a, f12.6)') 'Norm**2 b = ', b%Nrm2()
+
+  c = a%blk(1,1)
+  call c%prt('a(1,1)')
+  c = a%blk(2,2)
+  call c%prt('a(2,2)')
+
 end program test
 

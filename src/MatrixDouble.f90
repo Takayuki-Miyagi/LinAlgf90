@@ -1,10 +1,13 @@
 module MatrixDouble
   implicit none
-  private :: IniM, FinM, eye, Trans, Inverse, Det, &
-    & GetRandomMatrix, MatrixPrint, DiagMat
-  public :: DMat, MatrixCopyD, MatrixProductD, MatrixSumD, &
-    & MatrixSubtractD, MatrixScaleLD, MatrixScaleRD, &
-    & MatrixScaleDivideD
+
+  private :: IniM, FinM, eye, Trans, Inverse, Det
+  private :: GetRandomMatrix, MatrixPrint, DiagMat, block_dmat
+
+  public :: DMat, MatrixCopyD, MatrixProductD, MatrixSumD
+  public :: MatrixSubtractD, MatrixScaleLD, MatrixScaleRD
+  public :: MatrixScaleDivideD
+
   type :: DMat
     real(8), allocatable :: M(:,:)
   contains
@@ -15,6 +18,7 @@ module MatrixDouble
     procedure :: Inv => Inverse
     procedure :: Det
     procedure :: Random => GetRandomMatrix
+    procedure :: blk => block_dmat
     procedure :: prt => MatrixPrint
     procedure :: DiagMat
   end type DMat
@@ -202,6 +206,17 @@ contains
       write(*,cfmt) this%m(i,:)
     end do
   end subroutine MatrixPrint
+
+  function block_dmat(this, m1, m2, n1, n2) result(r)
+  class(DMat), intent(in) :: this
+    type(DMat) :: r
+    integer, intent(in) :: m1, m2, n1, n2
+    integer :: m, n
+    m = m2 - m1 + 1
+    n = n2 - n1 + 1
+    call r%ini(m,n)
+    r%m(:,:) = this%m(m1:m2,n1:n2)
+  end function block_dmat
 
   subroutine GetRandomMatrix(mat, m, n)
     use VectorDouble, only: DVec

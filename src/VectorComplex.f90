@@ -1,10 +1,13 @@
 module VectorComplex
   use LinAlgParameters
   implicit none
-  private :: iniV, FinV, ComplexConjugate, VectorPrint, GetRandomVector, &
-    & Nrm, Nrm2
-  public :: CVec, VectorCopyC, VectorSumC, VectorSubtractC, VectorScaleRC, &
-    & VectorScaleLC, VectorDivideC, InnerProductC
+
+  private :: iniV, FinV, ComplexConjugate, VectorPrint, GetRandomVector
+  private :: Nrm, Nrm2, block_cvec
+
+  public :: CVec, VectorCopyC, VectorSumC, VectorSubtractC, VectorScaleRC
+  public :: VectorScaleLC, VectorDivideC, InnerProductC
+
   type :: CVec
     complex(8), allocatable :: V(:)
   contains
@@ -13,6 +16,7 @@ module VectorComplex
     procedure :: CC => ComplexConjugate
     procedure :: prt => VectorPrint
     procedure :: Random => GetRandomVector
+    procedure :: blk => block_cvec
     procedure :: Nrm
     procedure :: Nrm2
   end type CVec
@@ -155,4 +159,15 @@ contains
     call v%ini(n)
     call zlarnv(idist, iseed, n, v%v)
   end subroutine GetRandomVector
+
+  function block_cvec(this, n1, n2) result(r)
+  class(CVec), intent(in) :: this
+    type(CVec) :: r
+    integer, intent(in) :: n1, n2
+    integer :: n
+    n = n2 - n1 + 1
+    call r%ini(n)
+    r%v(:) = this%v(n1:n2)
+  end function block_cvec
+
 end module VectorComplex
