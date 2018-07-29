@@ -9,17 +9,20 @@ module LinAlgLib
     & MatrixScaleRC, MatrixScaleLC, MatrixProductC, MatrixScaleDivideC
   use MatVecDouble, only: OuterProductD, VMProductD, MVProductD
   use MatVecComplex, only: OuterProductC, VMProductC, MVProductC
+
   implicit none
-  private :: VectorCopyD, VectorCopyC, MatrixCopyD, MatrixCopyC, &
-    & VectorSumD, VectorSumC, MatrixSumD, MatrixSumC, &
-    & VectorSubtractD, VectorSubtractC, MatrixSubtractD, MatrixSubtractC, &
-    & VectorScaleRD, VectorScaleRC, VectorScaleLD, VectorScaleLC, InnerProductD, &
-    & InnerProductC, MatrixScaleLC, MatrixScaleLD, MatrixScaleRC, MatrixScaleRD, &
-    & MatrixProductC, MatrixProductD, MVProductD,  VMProductD, MVProductC, VMProductC, &
-    & VectorDivideD, VectorDivideC, MatrixScaleDivideD, MatrixScaleDivideC, &
-    & OuterProductD, OuterProductC, InitEigenSolSymD, FinEigenSolSymD, DiagSym, Eigenval
-  public :: assignment(=), operator(+), operator(-), operator(*), &
-    & operator(/), operator(.x.), EigenSolSymD
+  private :: VectorCopyD, VectorCopyC, MatrixCopyD, MatrixCopyC
+  private :: VectorSumD, VectorSumC, MatrixSumD, MatrixSumC
+  private :: VectorSubtractD, VectorSubtractC, MatrixSubtractD, MatrixSubtractC
+  private :: VectorScaleRD, VectorScaleRC, VectorScaleLD, VectorScaleLC, InnerProductD
+  private :: InnerProductC, MatrixScaleLC, MatrixScaleLD, MatrixScaleRC, MatrixScaleRD
+  private :: MatrixProductC, MatrixProductD, MVProductD,  VMProductD, MVProductC, VMProductC
+  private :: VectorDivideD, VectorDivideC, MatrixScaleDivideD, MatrixScaleDivideC
+  private :: OuterProductD, OuterProductC, InitEigenSolSymD, FinEigenSolSymD, DiagSymD, EigenvalD
+  private :: InitEigenSolHermite, FinEigenSolHermite, DiagHermite!, EigenvalHermite
+
+  public :: assignment(=), operator(+), operator(-), operator(*)
+  public :: operator(/), operator(.x.), EigenSolSymD, EigenSolHermite, exp
 
   interface assignment(=)
     module procedure :: VectorCopyD, &
@@ -83,9 +86,19 @@ module LinAlgLib
   contains
     procedure :: init => InitEigenSolSymD
     procedure :: fin => FinEigenSolSymD
-    procedure :: DiagSym ! eigen values and eigen vectors
-    procedure :: Eigenval! only eigen values
+    procedure :: DiagSym => DiagSymD   ! eigen values and eigen vectors
+    procedure :: Eigenval => EigenvalD ! only eigen values
   end type EigenSolSymD
+
+  type :: EigenSolHermite
+    type(DVec) :: eig
+    type(CMat) :: vec
+  contains
+    procedure :: init => InitEigenSolHermite
+    procedure :: fin => FinEigenSolHermite
+    procedure :: DiagSym => DiagHermite      ! eigen values and eigen vectors
+    !procedure :: Eigenval => EigenvalHermite ! only eigen values
+  end type EigenSolHermite
 contains
 
   subroutine InitEigenSolSymD(this, A)
@@ -103,22 +116,24 @@ contains
     call this%vec%fin()
   end subroutine FinEigenSolSymD
 
-  subroutine DiagSym(this, A, qmin, qmax, m, error)
-    use LinAlgParameters, only: eps
+  subroutine DiagSymD(this, A, qmin, qmax, m, error)
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     real(8), intent(in), optional :: qmin, qmax
     integer, intent(in), optional :: m
     integer, intent(in), optional :: error
-    integer :: num
-    real(8), allocatable :: work(:), rcondz(:), zerrbd(:)
+    real(8), allocatable :: work(:), rcondz(:), zerrbd(:), mat(:,:)
     integer, allocatable :: iwork(:), ifailv(:)
-    integer :: info, lwork, n, i
+    integer :: info, lwork, n, i, num
     real(8) :: lw, dlamch, e, eerbd
     n = size(A%M, 1)
     this%vec = A
-    if(.not. present(m) .and. .not. present(qmin) .and. &
-        & .not. present(qmax)) then
+
+    if(.not. present(m) .and. .not. present(qmin) .and. .not. present(qmax)) then
+      !
+      ! solve all eigen values and eigen vectors
+      !
+
       call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, lw, -1, info)
       lwork = int(lw)
       allocate(work(lwork))
@@ -144,24 +159,44 @@ contains
       end if
 
     elseif(present(m)) then
+      !
+      ! solve lowest m eigen values and eigen vectors
+      !
+      this%eig%v(:) = 0.d0
+      allocate(mat(n,n))
       allocate(iwork(5*n), ifailv(n))
-      call dsyevx('v', 'i', 'u', n, this%vec%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
-          &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
-      deallocate( iwork, ifailv)
-
-    else
-      allocate(iwork(5*n), ifailv(n))
-      call dsyevx('v', 'i', 'u', n, this%vec%m, n, -1.d100, 1.d100, 1, n, dlamch('S'), &
+      mat = A%m
+      call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
           &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
       lwork = int(lw)
       allocate(work(1:lwork))
-      call dsyevx('v', 'v', 'u', n, this%vec%m, n, qmin, qmax, 1, n, eps, &
+      call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
           &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
-      deallocate( iwork, ifailv)
-    end if
-  end subroutine DiagSym
+      this%vec%m(:,num+1:n) = 0.d0
+      deallocate( iwork, ifailv, work, mat)
 
-  subroutine Eigenval(this, A, m)
+    elseif(present(qmin) .and. present(qmax)) then
+      !
+      ! solve eigen values in (qmin, qmax) and
+      ! corrsponding eigen vectors
+      !
+
+      allocate(mat(n,n))
+      allocate(iwork(5*n), ifailv(n))
+      mat = A%m
+      this%eig%v(:) = 0.d0
+      call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
+          &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+      lwork = int(lw)
+      allocate(work(1:lwork))
+      call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
+          &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
+      this%vec%m(:,num+1:n) = 0.d0
+      deallocate( iwork, ifailv, work, mat )
+    end if
+  end subroutine DiagSymD
+
+  subroutine EigenvalD(this, A, m)
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     integer, intent(in) :: m
@@ -184,7 +219,129 @@ contains
     end do
     deallocate(work)
     deallocate(d, e, tau,iblock, isplit)
-  end subroutine Eigenval
+  end subroutine EigenvalD
+
+  subroutine InitEigenSolHermite(this, A)
+    class(EigenSolHermite) :: this
+    type(CMat), intent(in) :: A
+    integer :: n
+    n = size(A%m, 1)
+    call this%eig%ini(n)
+    call this%vec%ini(n,n)
+  end subroutine InitEigenSolHermite
+
+  subroutine FinEigenSolHermite(this)
+    class(EigenSolHermite) :: this
+    call this%eig%fin()
+    call this%vec%fin()
+  end subroutine FinEigenSolHermite
+
+  subroutine DiagHermite(this, A, qmin, qmax, m, error)
+    class(EigenSolHermite) :: this
+    type(CMat), intent(in) :: A
+    real(8), intent(in), optional :: qmin, qmax
+    integer, intent(in), optional :: m
+    integer, intent(in), optional :: error
+    complex(8), allocatable :: work(:), mat(:,:)
+    real(8), allocatable :: rcondz(:), zerrbd(:), rwork(:)
+    integer, allocatable :: iwork(:), ifailv(:)
+    integer :: info, lwork, n, i, num
+    real(8) :: lw, dlamch, e, eerbd
+    n = size(A%M, 1)
+    this%vec = A
+
+    if(.not. present(m) .and. .not. present(qmin) .and. .not. present(qmax)) then
+      !
+      ! solve all eigen values and eigen vectors
+      !
+
+      allocate(rwork(3*n - 2))
+      call zheev('v', 'u', n, this%vec%m, n, this%eig%v, lw, -1, rwork, info)
+      lwork = int(lw)
+      allocate(work(lwork))
+      call zheev('v', 'u', n, this%vec%m, n, this%eig%v, work, lwork, rwork, info)
+      if(info /= 0) then
+        write(*,'(a, i6)') 'Error in DiagSym: info = ', info
+        stop
+      end if
+      deallocate(work, rwork)
+      !if(present(error)) then
+      !  allocate(rcondz(n), zerrbd(n))
+      !  e = epsilon(1.d0)
+      !  eerbd = e * max(abs(this%eig%v(1)), abs(this%eig%v(n)))
+      !  call ddisna('Eigenvectors', n, n, this%eig%v, rcondz, info)
+      !  do i = 1, n
+      !    zerrbd(i) = eerbd / rcondz(i)
+      !  end do
+      !  write(*,'(a)') 'Error estimate for eigen values'
+      !  write(*, '(1es12.4)') eerbd
+      !  write(*,'(a)') 'Error estimate for eigen vectors'
+      !  write(*, '(10es12.4)') zerrbd
+      !  deallocate(rcondz, zerrbd)
+      !end if
+
+    !elseif(present(m)) then
+    !  !
+    !  ! solve lowest m eigen values and eigen vectors
+    !  !
+    !  this%eig%v(:) = 0.d0
+    !  allocate(mat(n,n))
+    !  allocate(iwork(5*n), ifailv(n))
+    !  mat = A%m
+    !  call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
+    !      &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+    !  lwork = int(lw)
+    !  allocate(work(1:lwork))
+    !  call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
+    !      &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
+    !  this%vec%m(:,num+1:n) = 0.d0
+    !  deallocate( iwork, ifailv, work, mat)
+
+    !elseif(present(qmin) .and. present(qmax)) then
+    !  !
+    !  ! solve eigen values in (qmin, qmax) and
+    !  ! corrsponding eigen vectors
+    !  !
+
+    !  allocate(mat(n,n))
+    !  allocate(iwork(5*n), ifailv(n))
+    !  mat = A%m
+    !  this%eig%v(:) = 0.d0
+    !  call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
+    !      &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+    !  lwork = int(lw)
+    !  allocate(work(1:lwork))
+    !  call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
+    !      &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
+    !  this%vec%m(:,num+1:n) = 0.d0
+    !  deallocate( iwork, ifailv, work, mat )
+    end if
+  end subroutine DiagHermite
+
+  !subroutine EigenvalHermite(this, A, m)
+  !  class(EigenSolHermite) :: this
+  !  type(DMat), intent(in) :: A
+  !  integer, intent(in) :: m
+  !  integer, allocatable :: iwork(:), iblock(:), isplit(:)
+  !  real(8), allocatable :: work(:), d(:), e(:), tau(:), w(:)
+  !  real(8) :: dlamch, lw
+  !  integer :: n, info, lwork, nsplit, i
+
+  !  n = size(A%M, 1)
+  !  allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
+  !  allocate(iblock(n), isplit(n))
+  !  call dsytrd('u',n,A%m,n,d,e,tau,lw,-1,info)
+  !  lwork = int(lw)
+  !  allocate(work(lwork))
+  !  call dsytrd('u',n,A%m,n,d,e,tau,work,lwork,info)
+  !  call dstebz('i','e',n,0.d0,0.d0,1,min(n,m),dlamch('S'), &
+  !      & d, e, m, nsplit, w, iblock, isplit, work, iwork, info)
+  !  do i = 1, min(n,m)
+  !    this%eig%v(i) = w(i)
+  !  end do
+  !  deallocate(work)
+  !  deallocate(d, e, tau,iblock, isplit)
+  !end subroutine EigenvalHermite
 
   type(DMat) function ExpD(a, ord) result(r)
     type(DMat), intent(in) :: a

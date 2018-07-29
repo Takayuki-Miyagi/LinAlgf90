@@ -22,7 +22,12 @@ FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -Ddebug # For debug
 
 MAINDIR = test
 #SRCMAIN += $(MAINDIR)/test.f90
-SRCMAIN += $(MAINDIR)/test_EigenSolSymD.f90
+#SRCMAIN += $(MAINDIR)/test_DVec.f90
+#SRCMAIN += $(MAINDIR)/test_CVec.f90
+#SRCMAIN += $(MAINDIR)/test_DMat.f90
+#SRCMAIN += $(MAINDIR)/test_CMat.f90
+#SRCMAIN += $(MAINDIR)/test_EigenSolSymD.f90
+SRCMAIN += $(MAINDIR)/test_EigenSolHermite.f90
 
 
 SRCDIR = src

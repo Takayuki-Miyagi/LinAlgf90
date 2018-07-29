@@ -99,10 +99,10 @@ contains
     b%v = conjg(a%v)
   end function ComplexConjugate
 
-  complex(8) function InnerProductC(a, b) result(c)
+  real(8) function InnerProductC(a, b) result(c)
     type(CVec), intent(in) :: a, b
     integer :: n
-    complex(8) :: zdotu
+    real(8) :: zdotu
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in InnerProduct'
       stop
