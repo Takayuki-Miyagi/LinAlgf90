@@ -217,7 +217,6 @@ contains
     n = size(this%m, 1)
     m = size(this%m, 2)
     write(cfmt(2:3), '(I2)') m
-    write(*,*)
     if(present(string)) write(*,*) string
     write(*,'(a)') 'Real:'
     do i=1,n

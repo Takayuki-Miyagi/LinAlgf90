@@ -126,7 +126,6 @@ contains
     integer :: n
     character(*), intent(in), optional :: string
     n = size(this%v, 1)
-    write(*,*)
     if(present(string)) write(*,*) string
     write(*,'(10f10.4)') this%v(:)
   end subroutine VectorPrint

@@ -136,7 +136,6 @@ contains
     integer :: n
     character(*), intent(in), optional :: string
     n = size(this%v, 1)
-    write(*,*)
     if(present(string)) write(*,*) string
     write(*,'(a)',advance='no') 'Real:'
     write(*,'(10f10.4)') dble(this%v(:))
