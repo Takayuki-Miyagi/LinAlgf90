@@ -143,6 +143,9 @@ contains
         stop
       end if
       deallocate(work)
+      do i = 1, n
+        if(this%vec%m(1,i) < 0.d0) this%vec%m(:,i) = this%vec%m(:,i) * (-1.d0)
+      end do
       if(present(error)) then
         allocate(rcondz(n), zerrbd(n))
         e = epsilon(1.d0)
@@ -174,6 +177,9 @@ contains
           &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
       this%vec%m(:,num+1:n) = 0.d0
       deallocate( iwork, ifailv, work, mat)
+      do i = 1, num
+        if(this%vec%m(1,i) < 0.d0) this%vec%m(:,i) = this%vec%m(:,i) * (-1.d0)
+      end do
 
     elseif(present(qmin) .and. present(qmax)) then
       !
@@ -193,6 +199,9 @@ contains
           &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
       this%vec%m(:,num+1:n) = 0.d0
       deallocate( iwork, ifailv, work, mat )
+      do i = 1, num
+        if(this%vec%m(1,i) < 0.d0) this%vec%m(:,i) = this%vec%m(:,i) * (-1.d0)
+      end do
     end if
   end subroutine DiagSymD
 
