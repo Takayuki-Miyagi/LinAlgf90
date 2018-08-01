@@ -6,7 +6,7 @@ module MatVecComplex
 contains
   type(CMat) function OuterProductC(a, b) result(c)
     type(CVec), intent(in) :: a, b
-    integer :: n, m
+    integer(4) :: n, m
     n = size(a%v)
     m = size(b%v)
     call c%ini(n,m)
@@ -16,7 +16,7 @@ contains
   type(CVec) function MVProductC(a, b) result(c)
     type(CMat), intent(in) :: a
     type(CVec), intent(in) :: b
-    integer :: m, k
+    integer(4) :: m, k
     m = size(a%m, 1)
     k = size(a%m, 2)
     if(size(a%m, 2) /= size(b%v)) then
@@ -30,7 +30,7 @@ contains
   type(CVec) function VMProductC(a, b) result(c)
     type(CMat), intent(in) :: b
     type(CVec), intent(in) :: a
-    integer :: m, k, n
+    integer(4) :: m, k, n
     m = size(b%m, 1)
     k = size(b%m, 2)
     n = size(a%v, 1)

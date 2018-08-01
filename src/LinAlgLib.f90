@@ -104,7 +104,7 @@ contains
   subroutine InitEigenSolSymD(this, A)
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
-    integer :: n
+    integer(4) :: n
     n = size(A%m, 1)
     call this%eig%ini(n)
     call this%vec%ini(n,n)
@@ -120,11 +120,11 @@ contains
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
     real(8), intent(in), optional :: qmin, qmax
-    integer, intent(in), optional :: m
-    integer, intent(in), optional :: error
+    integer(4), intent(in), optional :: m
+    integer(4), intent(in), optional :: error
     real(8), allocatable :: work(:), rcondz(:), zerrbd(:), mat(:,:)
-    integer, allocatable :: iwork(:), ifailv(:)
-    integer :: info, lwork, n, i, num
+    integer(4), allocatable :: iwork(:), ifailv(:)
+    integer(4) :: info, lwork, n, i, num
     real(8) :: lw, dlamch, e, eerbd
     n = size(A%M, 1)
     this%vec = A
@@ -208,11 +208,11 @@ contains
   subroutine EigenvalD(this, A, m)
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
-    integer, intent(in) :: m
-    integer, allocatable :: iwork(:), iblock(:), isplit(:)
+    integer(4), intent(in) :: m
+    integer(4), allocatable :: iwork(:), iblock(:), isplit(:)
     real(8), allocatable :: work(:), d(:), e(:), tau(:), w(:)
     real(8) :: dlamch, lw
-    integer :: n, info, lwork, nsplit, i
+    integer(4) :: n, info, lwork, nsplit, i
 
     n = size(A%M, 1)
     allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
@@ -233,7 +233,7 @@ contains
   subroutine InitEigenSolHermite(this, A)
     class(EigenSolHermite) :: this
     type(CMat), intent(in) :: A
-    integer :: n
+    integer(4) :: n
     n = size(A%m, 1)
     call this%eig%ini(n)
     call this%vec%ini(n,n)
@@ -249,12 +249,12 @@ contains
     class(EigenSolHermite) :: this
     type(CMat), intent(in) :: A
     real(8), intent(in), optional :: qmin, qmax
-    integer, intent(in), optional :: m
-    integer, intent(in), optional :: error
+    integer(4), intent(in), optional :: m
+    integer(4), intent(in), optional :: error
     complex(8), allocatable :: work(:), mat(:,:)
     real(8), allocatable :: rcondz(:), zerrbd(:), rwork(:)
-    integer, allocatable :: iwork(:), ifailv(:)
-    integer :: info, lwork, n, i, num
+    integer(4), allocatable :: iwork(:), ifailv(:)
+    integer(4) :: info, lwork, n, i, num
     real(8) :: lw, dlamch, e, eerbd
     n = size(A%M, 1)
     this%vec = A
@@ -330,11 +330,11 @@ contains
   !subroutine EigenvalHermite(this, A, m)
   !  class(EigenSolHermite) :: this
   !  type(DMat), intent(in) :: A
-  !  integer, intent(in) :: m
-  !  integer, allocatable :: iwork(:), iblock(:), isplit(:)
+  !  integer(4), intent(in) :: m
+  !  integer(4), allocatable :: iwork(:), iblock(:), isplit(:)
   !  real(8), allocatable :: work(:), d(:), e(:), tau(:), w(:)
   !  real(8) :: dlamch, lw
-  !  integer :: n, info, lwork, nsplit, i
+  !  integer(4) :: n, info, lwork, nsplit, i
 
   !  n = size(A%M, 1)
   !  allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
@@ -355,9 +355,9 @@ contains
   type(DMat) function ExpD(a, ord) result(r)
     type(DMat), intent(in) :: a
     type(DMat) :: b
-    integer, intent(in), optional :: ord
-    integer :: i
-    integer :: iord = 12
+    integer(4), intent(in), optional :: ord
+    integer(4) :: i
+    integer(4) :: iord = 12
     if(present(ord)) iord = ord
     call r%eye(size(a%m, 1))
     b = r
@@ -370,9 +370,9 @@ contains
   type(CMat) function ExpC(a, ord) result(r)
     type(CMat), intent(in) :: a
     type(CMat) :: b
-    integer, intent(in), optional :: ord
-    integer :: i
-    integer :: iord = 12
+    integer(4), intent(in), optional :: ord
+    integer(4) :: i
+    integer(4) :: iord = 12
     if(present(ord)) iord = ord
     call r%eye(size(a%m, 1))
     b = r

@@ -8,13 +8,13 @@ INSTLDIR=./
 # for compile
 #--------------------------------------------------
 FDEP=makedepf90
-FC=gfortran -ff2c -fPIC
+FC=gfortran
 # NOTE -ff2c option is needed in complex dot product
 LIBS=-llapack -lblas
 
 OMP=-fopenmp
 FFLAGS=-O3
-FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -Ddebug # For debug
+#FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -Ddebug # For debug
 
 #--------------------------------------------------
 # Source Files
@@ -25,7 +25,8 @@ MAINDIR = test
 #SRCMAIN += $(MAINDIR)/test_DVec.f90
 #SRCMAIN += $(MAINDIR)/test_CVec.f90
 #SRCMAIN += $(MAINDIR)/test_DMat.f90
-SRCMAIN += $(MAINDIR)/test_CMat.f90
+#SRCMAIN += $(MAINDIR)/test_CMat.f90
+SRCMAIN += $(MAINDIR)/init_time.f90
 #SRCMAIN += $(MAINDIR)/test_EigenSolSymD.f90
 #SRCMAIN += $(MAINDIR)/test_EigenSolHermite.f90
 
@@ -72,7 +73,7 @@ $(TARGET): $(OBJS)
 $(OBJDIR)/%.o:$(SRCDIR)/%.F90
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -J$(MODDIR) -o $@ -c $<
 $(OBJDIR)/%.o:$(SRCDIR)/%.f90
-	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -J$(MODDIR) -o $@ -c $<
+	$(FC) $(FFLAGS) -ff2c $(OMP) $(FDFLAGS) -J$(MODDIR) -o $@ -c $<
 $(OBJDIR)/%.o:$(SRCMAIN)
 	$(FC) $(FFLAGS) $(OMP) $(FDFLAGS) -J$(MODDIR) -o $@ -c $<
 

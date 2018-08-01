@@ -12,6 +12,7 @@ module VectorDouble
     real(8), allocatable :: V(:)
   contains
     procedure :: Ini => iniV
+    procedure :: zeros
     procedure :: Fin => FinV
     procedure :: prt => VectorPrint
     procedure :: Random => GetRandomVector
@@ -22,11 +23,18 @@ module VectorDouble
 contains
   subroutine IniV(a, n)
   class(DVec), intent(inout) :: a
-    integer, intent(in) :: n
+    integer(4), intent(in) :: n
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
-    a%V(:) = 0.d0
   end subroutine IniV
+
+  subroutine zeros(a, n)
+  class(DVec), intent(inout) :: a
+    integer(4), intent(in) :: n
+    if(allocated(a%V)) deallocate(a%V)
+    allocate(a%V(n))
+    a%v(:) = 0.d0
+  end subroutine zeros
 
   subroutine FinV(a)
   class(DVec), intent(inout) :: a
@@ -36,7 +44,7 @@ contains
   subroutine VectorCopyD(b, a)
     type(DVec), intent(inout) :: b
     type(DVec), intent(in) :: a
-    integer :: n
+    integer(4) :: n
     n = size(a%V)
     call b%Ini(n)
     call dcopy(n, a%v, 1, b%v, 1)
@@ -44,7 +52,7 @@ contains
 
   type(DVec) function VectorSumD(a, b) result(c)
     type(DVec), intent(in) :: a, b
-    integer :: n
+    integer(4) :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in DVectorSum'
       stop
@@ -56,7 +64,7 @@ contains
 
   type(DVec) function VectorSubtractD(a, b) result(c)
     type(DVec), intent(in) :: a, b
-    integer :: n
+    integer(4) :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in DVectorSubtract'
       stop
@@ -69,7 +77,7 @@ contains
   type(DVec) function VectorScaleRD(a, b) result(c)
     type(DVec), intent(in) :: a
     real(8), intent(in) :: b
-    integer :: n
+    integer(4) :: n
     n = size(a%v)
     call VectorCopyD(c, a)
     call dscal(n, b, c%v, 1)
@@ -78,7 +86,7 @@ contains
   type(DVec) function VectorScaleLD(b, a) result(c)
     type(DVec), intent(in) :: a
     real(8), intent(in) :: b
-    integer :: n
+    integer(4) :: n
     n = size(a%v)
     call VectorCopyD(c, a)
     call dscal(n, b, c%v, 1)
@@ -87,7 +95,7 @@ contains
   type(DVec) function VectorDivideD(a, b) result(c)
     type(DVec), intent(in) :: a
     real(8), intent(in) :: b
-    integer :: n
+    integer(4) :: n
     n = size(a%v)
     call VectorCopyD(c, a)
     call dscal(n, 1.d0 / b, c%v, 1)
@@ -95,7 +103,7 @@ contains
 
   real(8) function InnerProductD(a, b) result(c)
     type(DVec), intent(in) :: a, b
-    integer :: n
+    integer(4) :: n
     real(8) :: ddot
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in InnerProduct'
@@ -107,7 +115,7 @@ contains
 
   real(8) function Nrm(a) result(b)
   class(DVec), intent(in) :: a
-    integer :: n
+    integer(4) :: n
     real(8) :: dnrm2
     n = size(a%v)
     b = dnrm2(n, a%v, 1)
@@ -115,7 +123,7 @@ contains
 
   real(8) function Nrm2(a) result(b)
   class(DVec), intent(in) :: a
-    integer :: n
+    integer(4) :: n
     real(8) :: ddot
     n = size(a%v)
     b = ddot(n, a%v, 1, a%v, 1)
@@ -123,7 +131,7 @@ contains
 
   subroutine VectorPrint(this, string)
   class(DVec),intent(in)::this
-    integer :: n
+    integer(4) :: n
     character(*), intent(in), optional :: string
     n = size(this%v, 1)
     if(present(string)) write(*,*) string
@@ -135,9 +143,9 @@ contains
     ! idist = 2: uniform (-1, 1)
     ! idist = 3: normal (-1, 1)
   class(DVec), intent(inout) :: v
-    integer, intent(in) :: n
-    integer, intent(in), optional :: dist
-    integer :: idist = 3
+    integer(4), intent(in) :: n
+    integer(4), intent(in), optional :: dist
+    integer(4) :: idist = 3
     if(present(dist)) idist = dist
     call v%ini(n)
     call dlarnv(idist, iseed, n, v%v)
@@ -146,8 +154,8 @@ contains
   function block_dvec(this, n1, n2) result(r)
   class(DVec), intent(in) :: this
     type(DVec) :: r
-    integer, intent(in) :: n1, n2
-    integer :: n
+    integer(4), intent(in) :: n1, n2
+    integer(4) :: n
     n = n2 - n1 + 1
     call r%ini(n)
     r%v(:) = this%v(n1:n2)
