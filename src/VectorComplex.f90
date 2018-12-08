@@ -2,8 +2,8 @@ module VectorComplex
   use LinAlgParameters
   implicit none
 
-  private :: iniV, FinV, ComplexConjugate, VectorPrint, GetRandomVector
-  private :: Nrm, Nrm2, block_cvec
+  private :: iniV, FinV, ComplexConjugate, VectorPrintAscii, GetRandomVector
+  private :: Nrm, Nrm2, block_cvec, VectorPrintBinary
 
   public :: CVec, VectorCopyC, VectorSumC, VectorSubtractC, VectorScaleRC
   public :: VectorScaleLC, VectorDivideC, InnerProductC
@@ -15,7 +15,8 @@ module VectorComplex
     procedure :: zeros
     procedure :: Fin => FinV
     procedure :: CC => ComplexConjugate
-    procedure :: prt => VectorPrint
+    procedure :: prt => VectorPrintAscii
+    procedure :: prtbin => VectorPrintBinary
     procedure :: Random => GetRandomVector
     procedure :: blk => block_cvec
     procedure :: Nrm
@@ -139,18 +140,33 @@ contains
     b = dznrm2(n, a%v, 1) ** 2
   end function Nrm2
 
-  subroutine VectorPrint(this, string)
-  class(CVec),intent(in)::this
-    integer(4) :: n
-    character(*), intent(in), optional :: string
+  subroutine VectorPrintAscii(this, iunit, msg)
+    class(CVec),intent(in)::this
+    integer, intent(in), optional :: iunit
+    character(*), intent(in), optional :: msg
+    integer(4) :: n, i, unt
+    if(present(iunit)) then; unt = iunit
+    else; unt = 6; end if
     n = size(this%v, 1)
-    if(present(string)) write(*,*) string
-    write(*,'(a)',advance='no') 'Real:'
-    write(*,'(10f10.4)') dble(this%v(:))
-    write(*,'(a)',advance='no') 'Imag:'
-    write(*,'(10f10.4)') dimag(this%v(:))
-    !write(*,*) this%v(:)
-  end subroutine VectorPrint
+    if(unt == 6) then
+      if(present(msg)) write(unt,*) msg
+      write(unt,'(a)',advance='no') 'Real:'
+      write(unt,'(10f10.4)') dble(this%v(:))
+      write(unt,'(a)',advance='no') 'Imag:'
+      write(unt,'(10f10.4)') dimag(this%v(:))
+    else
+      do i = 1, n
+        write(unt,'(10f10.4)') this%v(i)
+      end do
+    end if
+  end subroutine VectorPrintAscii
+
+  subroutine VectorPrintBinary(this, iunit)
+    class(CVec),intent(in)::this
+    integer, intent(in) :: iunit
+    integer(4) :: n
+    write(iunit) this%v
+  end subroutine VectorPrintBinary
 
   subroutine GetRandomVector(v, n, dist)
     ! idist = = 1:  real and imaginary parts each uniform (0,1)

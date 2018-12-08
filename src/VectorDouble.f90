@@ -2,8 +2,8 @@ module VectorDouble
   use LinAlgParameters
   implicit none
 
-  private :: IniV, FinV, VectorPrint, GetRandomVector, Nrm, Nrm2
-  private :: block_dvec
+  private :: IniV, FinV, VectorPrintAscii, GetRandomVector, Nrm, Nrm2
+  private :: block_dvec, VectorPrintBinary
 
   public :: DVec, VectorCopyD, VectorSumD, VectorSubtractD
   public :: VectorScaleRD, VectorScaleLD, VectorDivideD, InnerProductD
@@ -14,7 +14,8 @@ module VectorDouble
     procedure :: Ini => iniV
     procedure :: zeros
     procedure :: Fin => FinV
-    procedure :: prt => VectorPrint
+    procedure :: prt => VectorPrintAscii
+    procedure :: prtbin => VectorPrintBinary
     procedure :: Random => GetRandomVector
     procedure :: blk => block_dvec
     procedure :: Nrm
@@ -129,14 +130,29 @@ contains
     b = ddot(n, a%v, 1, a%v, 1)
   end function Nrm2
 
-  subroutine VectorPrint(this, string)
+  subroutine VectorPrintAscii(this, iunit, msg)
   class(DVec),intent(in)::this
-    integer(4) :: n
-    character(*), intent(in), optional :: string
+    integer :: i, n, unt
+    integer, intent(in), optional :: iunit
+    character(*), intent(in), optional :: msg
+    if(present(iunit)) then; unt = iunit
+    else; unt = 6; end if
     n = size(this%v, 1)
-    if(present(string)) write(*,*) string
-    write(*,'(10f10.4)') this%v(:)
-  end subroutine VectorPrint
+    if(unt == 6) then
+      if(present(msg)) write(*,*) msg
+      write(unt,'(10f10.4)') this%v(:)
+    else
+      do i = 1, n
+        write(unt,'(10f10.4)') this%v(i)
+      end do
+    end if
+  end subroutine VectorPrintAscii
+
+  subroutine VectorPrintBinary(this, iunit)
+    class(DVec),intent(in)::this
+    integer, intent(in) :: iunit
+    write(iunit) this%v(:)
+  end subroutine VectorPrintBinary
 
   subroutine GetRandomVector(v, n, dist)
     ! idist = 1: uniform (0, 1)

@@ -2,7 +2,8 @@ module MatrixDouble
   implicit none
 
   private :: IniM, FinM, eye, Trans, Inverse, Det
-  private :: GetRandomMatrix, MatrixPrint, DiagMat, block_dmat
+  private :: GetRandomMatrix, MatrixPrintAscii, MatrixPrintBinary
+  private :: DiagMat, block_dmat
 
   public :: DMat, MatrixCopyD, MatrixProductD, MatrixSumD
   public :: MatrixSubtractD, MatrixScaleLD, MatrixScaleRD
@@ -20,7 +21,8 @@ module MatrixDouble
     procedure :: Det
     procedure :: Random => GetRandomMatrix
     procedure :: blk => block_dmat
-    procedure :: prt => MatrixPrint
+    procedure :: prt => MatrixPrintAscii
+    procedure :: prtbin => MatrixPrintBinary
     procedure :: DiagMat
   end type DMat
 contains
@@ -198,20 +200,41 @@ contains
     deallocate(ipiv, a)
   end function Det
 
-  subroutine MatrixPrint(this, string)
-  class(DMat), intent(in) :: this
+  subroutine MatrixPrintAscii(this, iunit, msg)
+    class(DMat), intent(in) :: this
+    integer, intent(in), optional :: iunit
     character(12) :: cfmt
-    integer(4) :: i, n, m
-    character(*), intent(in), optional :: string
-    cfmt = '( xf10.4)'
+    integer(4) :: i, j, n, m
+    integer :: unt
+    character(*), intent(in), optional :: msg
     n = size(this%m, 1)
     m = size(this%m, 2)
-    write(cfmt(2:3), '(I2)') m
-    if(present(string)) write(*,*) string
-    do i=1,n
-      write(*,cfmt) this%m(i,:)
-    end do
-  end subroutine MatrixPrint
+    if(present(iunit)) then
+      unt = iunit
+    else
+      unt = 6
+    end if
+    if(unt == 6) then
+      cfmt = '( xf10.4)'
+      write(cfmt(2:3), '(I2)') m
+      if(present(msg)) write(unt,*) msg
+      do i=1,n
+        write(unt,cfmt) this%m(i,:)
+      end do
+    else
+      do i=1,n
+        do j=1,m
+          write(unt,'(2i8,f14.6)') i,j,this%m(i,j)
+        end do
+      end do
+    end if
+  end subroutine MatrixPrintAscii
+
+  subroutine MatrixPrintBinary(this, iunit)
+    class(DMat), intent(in) :: this
+    integer, intent(in) :: iunit
+    write(iunit) this%m
+  end subroutine MatrixPrintBinary
 
   function block_dmat(this, m1, m2, n1, n2) result(r)
   class(DMat), intent(in) :: this
@@ -226,7 +249,7 @@ contains
 
   subroutine GetRandomMatrix(mat, m, n)
     use VectorDouble, only: DVec
-  class(DMat), intent(inout) :: mat
+    class(DMat), intent(inout) :: mat
     integer(4), intent(in) :: m, n
     integer(4) :: i
     type(DVec) :: v
