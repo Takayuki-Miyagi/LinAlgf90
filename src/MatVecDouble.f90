@@ -1,4 +1,5 @@
 module MatVecDouble
+  use LinAlgParameters
   use VectorDouble, only: DVec
   use MatrixDouble, only: DMat
   implicit none
@@ -6,7 +7,7 @@ module MatVecDouble
 contains
   type(DMat) function OuterProductD(a, b) result(c)
     type(DVec), intent(in) :: a, b
-    integer(4) :: n, m
+    integer(kp) :: n, m
     n = size(a%v)
     m = size(b%v)
     call c%ini(n,m)
@@ -16,7 +17,7 @@ contains
   type(DVec) function MVProductD(a, b) result(c)
     type(DMat), intent(in) :: a
     type(DVec), intent(in) :: b
-    integer(4) :: m, k
+    integer(kp) :: m, k
     m = size(a%m, 1)
     k = size(a%m, 2)
     if(size(a%m, 2) /= size(b%v)) then
@@ -30,7 +31,7 @@ contains
   type(DVec) function VMProductD(a, b) result(c)
     type(DMat), intent(in) :: b
     type(DVec), intent(in) :: a
-    integer(4) :: m, k, n
+    integer(kp) :: m, k, n
     m = size(b%m, 1)
     k = size(b%m, 2)
     n = size(a%v, 1)

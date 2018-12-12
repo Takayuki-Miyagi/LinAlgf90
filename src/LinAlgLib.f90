@@ -1,4 +1,5 @@
 module LinAlgLib
+  use LinAlgParameters
   use VectorDouble, only: DVec, VectorCopyD, VectorSumD, VectorSubtractD, &
     & VectorScaleRD, VectorScaleLD, InnerProductD, VectorDivideD
   use VectorComplex, only: CVec, VectorCopyC, VectorSumC, VectorSubtractC, &
@@ -104,7 +105,7 @@ contains
   subroutine InitEigenSolSymD(this, A)
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
-    integer(4) :: n
+    integer(kp) :: n
     n = size(A%m, 1)
     call this%eig%ini(n)
     call this%vec%ini(n,n)
@@ -119,13 +120,13 @@ contains
   subroutine DiagSymD(this, A, qmin, qmax, m, error)
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
-    real(8), intent(in), optional :: qmin, qmax
-    integer(4), intent(in), optional :: m
-    integer(4), intent(in), optional :: error
-    real(8), allocatable :: work(:), rcondz(:), zerrbd(:), mat(:,:)
-    integer(4), allocatable :: iwork(:), ifailv(:)
-    integer(4) :: info, lwork, n, i, num
-    real(8) :: lw, dlamch, e, eerbd
+    real(dp), intent(in), optional :: qmin, qmax
+    integer(kp), intent(in), optional :: m
+    integer(kp), intent(in), optional :: error
+    real(dp), allocatable :: work(:), rcondz(:), zerrbd(:), mat(:,:)
+    integer(kp), allocatable :: iwork(:), ifailv(:)
+    integer(kp) :: info, lwork, n, i, num
+    real(dp) :: lw, dlamch, e, eerbd
     n = size(A%M, 1)
     this%vec = A
 
@@ -208,11 +209,11 @@ contains
   subroutine EigenvalD(this, A, m)
     class(EigenSolSymD) :: this
     type(DMat), intent(in) :: A
-    integer(4), intent(in) :: m
-    integer(4), allocatable :: iwork(:), iblock(:), isplit(:)
-    real(8), allocatable :: work(:), d(:), e(:), tau(:), w(:)
-    real(8) :: dlamch, lw
-    integer(4) :: n, info, lwork, nsplit, i
+    integer(kp), intent(in) :: m
+    integer(kp), allocatable :: iwork(:), iblock(:), isplit(:)
+    real(dp), allocatable :: work(:), d(:), e(:), tau(:), w(:)
+    real(dp) :: dlamch, lw
+    integer(kp) :: n, info, lwork, nsplit, i
 
     n = size(A%M, 1)
     allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
@@ -233,7 +234,7 @@ contains
   subroutine InitEigenSolHermite(this, A)
     class(EigenSolHermite) :: this
     type(CMat), intent(in) :: A
-    integer(4) :: n
+    integer(kp) :: n
     n = size(A%m, 1)
     call this%eig%ini(n)
     call this%vec%ini(n,n)
@@ -248,14 +249,13 @@ contains
   subroutine DiagHermite(this, A, qmin, qmax, m, error)
     class(EigenSolHermite) :: this
     type(CMat), intent(in) :: A
-    real(8), intent(in), optional :: qmin, qmax
-    integer(4), intent(in), optional :: m
-    integer(4), intent(in), optional :: error
-    complex(8), allocatable :: work(:), mat(:,:)
-    real(8), allocatable :: rcondz(:), zerrbd(:), rwork(:)
-    integer(4), allocatable :: iwork(:), ifailv(:)
-    integer(4) :: info, lwork, n, i, num
-    real(8) :: lw, dlamch, e, eerbd
+    real(dp), intent(in), optional :: qmin, qmax
+    integer(kp), intent(in), optional :: m
+    integer(kp), intent(in), optional :: error
+    complex(dp), allocatable :: work(:)
+    real(dp), allocatable :: rwork(:)
+    integer(kp) :: info, lwork, n
+    real(dp) :: lw
     n = size(A%M, 1)
     this%vec = A
 
@@ -330,11 +330,11 @@ contains
   !subroutine EigenvalHermite(this, A, m)
   !  class(EigenSolHermite) :: this
   !  type(DMat), intent(in) :: A
-  !  integer(4), intent(in) :: m
-  !  integer(4), allocatable :: iwork(:), iblock(:), isplit(:)
-  !  real(8), allocatable :: work(:), d(:), e(:), tau(:), w(:)
-  !  real(8) :: dlamch, lw
-  !  integer(4) :: n, info, lwork, nsplit, i
+  !  integer(kp), intent(in) :: m
+  !  integer(kp), allocatable :: iwork(:), iblock(:), isplit(:)
+  !  real(dp), allocatable :: work(:), d(:), e(:), tau(:), w(:)
+  !  real(dp) :: dlamch, lw
+  !  integer(kp) :: n, info, lwork, nsplit, i
 
   !  n = size(A%M, 1)
   !  allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
@@ -355,9 +355,9 @@ contains
   type(DMat) function ExpD(a, ord) result(r)
     type(DMat), intent(in) :: a
     type(DMat) :: b
-    integer(4), intent(in), optional :: ord
-    integer(4) :: i
-    integer(4) :: iord = 12
+    integer(kp), intent(in), optional :: ord
+    integer(kp) :: i
+    integer(kp) :: iord = 12
     if(present(ord)) iord = ord
     call r%eye(size(a%m, 1))
     b = r
@@ -370,9 +370,9 @@ contains
   type(CMat) function ExpC(a, ord) result(r)
     type(CMat), intent(in) :: a
     type(CMat) :: b
-    integer(4), intent(in), optional :: ord
-    integer(4) :: i
-    integer(4) :: iord = 12
+    integer(kp), intent(in), optional :: ord
+    integer(kp) :: i
+    integer(kp) :: iord = 12
     if(present(ord)) iord = ord
     call r%eye(size(a%m, 1))
     b = r

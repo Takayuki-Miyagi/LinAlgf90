@@ -9,7 +9,7 @@ module VectorComplex
   public :: VectorScaleLC, VectorDivideC, InnerProductC
 
   type :: CVec
-    complex(8), allocatable :: V(:)
+    complex(dp), allocatable :: V(:)
   contains
     procedure :: Ini => iniV
     procedure :: zeros
@@ -24,14 +24,14 @@ module VectorComplex
 contains
   subroutine IniV(a, n)
   class(CVec), intent(inout) :: a
-    integer(4), intent(in) :: n
+    integer(kp), intent(in) :: n
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
   end subroutine IniV
 
   subroutine zeros(a, n)
   class(CVec), intent(inout) :: a
-    integer(4), intent(in) :: n
+    integer(kp), intent(in) :: n
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
     a%V(:) = 0.d0
@@ -45,7 +45,7 @@ contains
   subroutine VectorCopyC(b, a)
     type(CVec), intent(inout) :: b
     type(CVec), intent(in) :: a
-    integer(4) :: n
+    integer(kp) :: n
     n = size(a%V)
     call b%Ini(n)
     call zcopy(n, a%v, 1, b%v, 1)
@@ -53,7 +53,7 @@ contains
 
   type(CVec) function VectorSumC(a, b) result(c)
     type(CVec), intent(in) :: a, b
-    integer(4) :: n
+    integer(kp) :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in DVectorSum'
       stop
@@ -65,7 +65,7 @@ contains
 
   type(CVec) function VectorSubtractC(a, b) result(c)
     type(CVec), intent(in) :: a, b
-    integer(4) :: n
+    integer(kp) :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in DVectorSubtract'
       stop
@@ -77,8 +77,8 @@ contains
 
   type(CVec) function VectorScaleRC(a, b) result(c)
     type(CVec), intent(in) :: a
-    complex(8), intent(in) :: b
-    integer(4) :: n
+    complex(dp), intent(in) :: b
+    integer(kp) :: n
     n = size(a%v)
     call VectorCopyC(c,a)
     call zscal(n, b, c%v, 1)
@@ -87,8 +87,8 @@ contains
 
   type(CVec) function VectorScaleLC(b, a) result(c)
     type(CVec), intent(in) :: a
-    complex(8), intent(in) :: b
-    integer(4) :: n
+    complex(dp), intent(in) :: b
+    integer(kp) :: n
     n = size(a%v)
     call VectorCopyC(c,a)
     call dscal(n, b, c%v, 1)
@@ -97,7 +97,7 @@ contains
   type(CVec) function VectorDivideC(a, b) result(c)
     type(CVec), intent(in) :: a
     real(8), intent(in) :: b
-    integer(4) :: n
+    integer(kp) :: n
     n = size(a%v)
     call VectorCopyC(c,a)
     call zdscal(n, 1.d0 / b, c%v, 1)
@@ -105,7 +105,7 @@ contains
 
   type(CVec) function ComplexConjugate(a) result(b)
   class(CVec), intent(in) :: a
-    integer(4) :: n
+    integer(kp) :: n
     n = size(a%v)
     call b%ini(n)
     b%v = conjg(a%v)
@@ -113,7 +113,7 @@ contains
 
   real(8) function InnerProductC(a, b) result(c)
     type(CVec), intent(in) :: a, b
-    integer(4) :: n
+    integer(kp) :: n
     real(8) :: zdotu
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in InnerProduct'
@@ -125,7 +125,7 @@ contains
 
   real(8) function Nrm(a) result(b)
   class(CVec), intent(in) :: a
-    integer(4) :: n
+    integer(kp) :: n
     real(8) :: dznrm2
     n = size(a%v)
     b = dznrm2(n, a%v, 1)
@@ -133,7 +133,7 @@ contains
 
   real(8) function Nrm2(a) result(b)
   class(CVec), intent(in) :: a
-    integer(4) :: n
+    integer(kp) :: n
     real(8) :: dznrm2
     n = size(a%v)
     b = dznrm2(n, a%v, 1) ** 2
@@ -141,14 +141,14 @@ contains
 
   subroutine VectorPrint(this, string)
   class(CVec),intent(in)::this
-    integer(4) :: n
+    integer(kp) :: n
     character(*), intent(in), optional :: string
     n = size(this%v, 1)
     if(present(string)) write(*,*) string
     write(*,'(a)',advance='no') 'Real:'
     write(*,'(10f10.4)') dble(this%v(:))
     write(*,'(a)',advance='no') 'Imag:'
-    write(*,'(10f10.4)') dimag(this%v(:))
+    write(*,'(10f10.4)') aimag(this%v(:))
     !write(*,*) this%v(:)
   end subroutine VectorPrint
 
@@ -159,9 +159,9 @@ contains
     ! idist = = 4:  uniformly distributed on the disc abs(z) < 1
     ! idist = = 5:  uniformly distributed on the circle abs(z) = 1
   class(CVec), intent(inout) :: v
-    integer(4), intent(in) :: n
-    integer(4), intent(in), optional :: dist
-    integer(4) :: idist = 4
+    integer(kp), intent(in) :: n
+    integer(kp), intent(in), optional :: dist
+    integer(kp) :: idist = 4
     if(present(dist)) idist = dist
     call v%ini(n)
     call zlarnv(idist, iseed, n, v%v)
@@ -170,8 +170,8 @@ contains
   function block_cvec(this, n1, n2) result(r)
   class(CVec), intent(in) :: this
     type(CVec) :: r
-    integer(4), intent(in) :: n1, n2
-    integer(4) :: n
+    integer(kp), intent(in) :: n1, n2
+    integer(kp) :: n
     n = n2 - n1 + 1
     call r%ini(n)
     r%v(:) = this%v(n1:n2)

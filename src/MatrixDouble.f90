@@ -1,6 +1,6 @@
 module MatrixDouble
+  use LinAlgParameters
   implicit none
-
   private :: IniM, FinM, eye, Trans, Inverse, Det
   private :: GetRandomMatrix, MatrixPrint, DiagMat, block_dmat
 
@@ -9,7 +9,7 @@ module MatrixDouble
   public :: MatrixScaleDivideD
 
   type :: DMat
-    real(8), allocatable :: M(:,:)
+    real(dp), allocatable :: M(:,:)
   contains
     procedure :: Ini => IniM
     procedure :: Fin => FinM
@@ -26,14 +26,14 @@ module MatrixDouble
 contains
   subroutine iniM(a, m, n)
   class(DMat), intent(inout) :: a
-    integer(4), intent(in) :: m,n
+    integer(kp), intent(in) :: m,n
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(m,n))
   end subroutine iniM
 
   subroutine zeros(a, m, n)
   class(DMat), intent(inout) :: a
-    integer(4), intent(in) :: m,n
+    integer(kp), intent(in) :: m,n
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(m,n))
     a%m = 0.d0
@@ -41,8 +41,8 @@ contains
 
   subroutine eye(a, n)
   class(DMat), intent(inout) :: a
-    integer(4), intent(in) :: n
-    integer(4) :: i
+    integer(kp), intent(in) :: n
+    integer(kp) :: i
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(n,n))
     a%m = 0.d0
@@ -59,7 +59,7 @@ contains
   subroutine MatrixCopyD(b, a)
     type(DMat), intent(inout) :: b
     type(DMat), intent(in) :: a
-    integer(4) :: m, n, i
+    integer(kp) :: m, n, i
     m = size(a%m, 1)
     n = size(a%m, 2)
     call b%Ini(m,n)
@@ -70,7 +70,7 @@ contains
 
   type(DMat) function MatrixProductD(a, b) result(c)
     type(DMat), intent(in) :: a, b
-    integer(4) :: m, k, n
+    integer(kp) :: m, k, n
     m = size(a%m, 1)
     k = size(a%m, 2)
     if(size(a%m, 2) /= size(b%m, 1)) then
@@ -84,7 +84,7 @@ contains
 
   type(DMat) function MatrixSumD(a, b) result(c)
     type(DMat), intent(in) :: a, b
-    integer(4) :: m, n, i
+    integer(kp) :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
       stop
@@ -99,7 +99,7 @@ contains
 
   type(DMat) function MatrixSubtractD(a, b) result(c)
     type(DMat), intent(in) :: a, b
-    integer(4) :: m, n, i
+    integer(kp) :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
       stop
@@ -114,8 +114,8 @@ contains
 
   type(DMat) function MatrixScaleLD(b, a) result(c)
     type(DMat), intent(in) :: b
-    real(8), intent(in) :: a
-    integer(4) :: m, n, i
+    real(dp), intent(in) :: a
+    integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
     call MatrixCopyD(c, b)
@@ -126,8 +126,8 @@ contains
 
   type(DMat) function MatrixScaleRD(a, b) result(c)
     type(DMat), intent(in) :: b
-    real(8), intent(in) :: a
-    integer(4) :: m, n, i
+    real(dp), intent(in) :: a
+    integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
     call MatrixCopyD(c, b)
@@ -138,8 +138,8 @@ contains
 
   type(DMat) function MatrixScaleDivideD(b, a) result(c)
     type(DMat), intent(in) :: b
-    real(8), intent(in) :: a
-    integer(4) :: m, n, i
+    real(dp), intent(in) :: a
+    integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
     call MatrixCopyD(c, b)
@@ -150,7 +150,7 @@ contains
 
   type(DMat) function Trans(a) result(b)
     class(DMat), intent(in) :: a
-    integer(4) :: n, m
+    integer(kp) :: n, m
     m = size(a%m, 1)
     n = size(a%m, 2)
     call b%Ini(n,m)
@@ -159,10 +159,10 @@ contains
 
   type(DMat) function inverse(r) result(s)
   class(DMat), intent(in) :: r
-    real(8), allocatable :: a(:,:)
-    real(8), allocatable :: work(:)
-    integer(4), allocatable :: ipvt(:)
-    integer(4) :: info, n
+    real(dp), allocatable :: a(:,:)
+    real(dp), allocatable :: work(:)
+    integer(kp), allocatable :: ipvt(:)
+    integer(kp) :: info, n
     n = size(r%m, 1)
     call s%Ini(n,n)
     allocate(work(n*n),ipvt(n))
@@ -174,11 +174,11 @@ contains
     deallocate(a,work,ipvt)
   end function inverse
 
-  real(8) function Det(r) result(d)
+  real(dp) function Det(r) result(d)
   class(DMat), intent(in) :: r
-    integer(4) :: n, i, info
-    real(8), allocatable :: a(:,:)
-    integer(4), allocatable :: ipiv(:)
+    integer(kp) :: n, i, info
+    real(dp), allocatable :: a(:,:)
+    integer(kp), allocatable :: ipiv(:)
     n = size(r%m, 1)
     allocate(ipiv(n), a(n,n))
     a = r%m
@@ -201,7 +201,7 @@ contains
   subroutine MatrixPrint(this, string)
   class(DMat), intent(in) :: this
     character(12) :: cfmt
-    integer(4) :: i, n, m
+    integer(kp) :: i, n, m
     character(*), intent(in), optional :: string
     cfmt = '( xf10.4)'
     n = size(this%m, 1)
@@ -216,8 +216,8 @@ contains
   function block_dmat(this, m1, m2, n1, n2) result(r)
   class(DMat), intent(in) :: this
     type(DMat) :: r
-    integer(4), intent(in) :: m1, m2, n1, n2
-    integer(4) :: m, n
+    integer(kp), intent(in) :: m1, m2, n1, n2
+    integer(kp) :: m, n
     m = m2 - m1 + 1
     n = n2 - n1 + 1
     call r%ini(m,n)
@@ -227,8 +227,8 @@ contains
   subroutine GetRandomMatrix(mat, m, n)
     use VectorDouble, only: DVec
   class(DMat), intent(inout) :: mat
-    integer(4), intent(in) :: m, n
-    integer(4) :: i
+    integer(kp), intent(in) :: m, n
+    integer(kp) :: i
     type(DVec) :: v
     call mat%ini(m,n)
     do i = 1, n
@@ -242,7 +242,7 @@ contains
     use VectorDouble, only: DVec
   class(DMat), intent(inout) :: b
     type(DVec), intent(in) :: a
-    integer(4) :: n, i
+    integer(kp) :: n, i
     n = size(a%V)
     call b%Ini(n,n)
     do i = 1, n

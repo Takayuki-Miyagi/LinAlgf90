@@ -1,4 +1,5 @@
 module MatrixComplex
+  use LinAlgParameters
   implicit none
 
   private :: IniM, FinM, eye, Trans, ComplexConjugate
@@ -9,7 +10,7 @@ module MatrixComplex
   public :: MatrixSubtractC, MatrixScaleLC, MatrixScaleRC
   public :: MatrixScaleDivideC
   type :: CMat
-    complex(8), allocatable :: M(:,:)
+    complex(dp), allocatable :: M(:,:)
   contains
     procedure :: Ini => IniM
     procedure :: Fin => FinM
@@ -27,24 +28,24 @@ module MatrixComplex
   end type CMat
 contains
   subroutine iniM(a, m, n)
-  class(CMat), intent(inout) :: a
-    integer(4), intent(in) :: m,n
+    class(CMat), intent(inout) :: a
+    integer(kp), intent(in) :: m,n
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(m,n))
   end subroutine iniM
 
   subroutine zeros(a, m, n)
-  class(CMat), intent(inout) :: a
-    integer(4), intent(in) :: m,n
+    class(CMat), intent(inout) :: a
+    integer(kp), intent(in) :: m,n
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(m,n))
     a%m = 0.d0
   end subroutine zeros
 
   subroutine eye(a, n)
-  class(CMat), intent(inout) :: a
-    integer(4), intent(in) :: n
-    integer(4) :: i
+    class(CMat), intent(inout) :: a
+    integer(kp), intent(in) :: n
+    integer(kp) :: i
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(n,n))
     a%m = 0.d0
@@ -54,14 +55,14 @@ contains
   end subroutine eye
 
   subroutine FinM(a)
-  class(CMat), intent(inout) :: a
+    class(CMat), intent(inout) :: a
     if(allocated(a%m)) deallocate(a%m)
   end subroutine FinM
 
   subroutine MatrixCopyC(b, a)
     type(CMat), intent(inout) :: b
     type(CMat), intent(in) :: a
-    integer(4) :: m, n, i
+    integer(kp) :: m, n, i
     m = size(a%m, 1)
     n = size(a%m, 2)
     call b%Ini(m,n)
@@ -72,7 +73,7 @@ contains
 
   type(CMat) function MatrixProductC(a, b) result(c)
     type(CMat), intent(in) :: a, b
-    integer(4) :: m, k, n
+    integer(kp) :: m, k, n
     m = size(a%m, 1)
     k = size(a%m, 2)
     if(size(a%m, 2) /= size(b%m, 1)) then
@@ -86,7 +87,7 @@ contains
 
   type(CMat) function MatrixSumC(a, b) result(c)
     type(CMat), intent(in) :: a, b
-    integer(4) :: m, n, i
+    integer(kp) :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
       stop
@@ -101,7 +102,7 @@ contains
 
   type(CMat) function MatrixSubtractC(a, b) result(c)
     type(CMat), intent(in) :: a, b
-    integer(4) :: m, n, i
+    integer(kp) :: m, n, i
     if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
       write(*, '(a)') 'Error in MatrixSum'
       stop
@@ -116,8 +117,8 @@ contains
 
   type(CMat) function MatrixScaleLC(b, a) result(c)
     type(CMat), intent(in) :: b
-    complex(8), intent(in) :: a
-    integer(4) :: m, n, i
+    complex(dp), intent(in) :: a
+    integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
     call MatrixCopyC(c, b)
@@ -129,8 +130,8 @@ contains
 
   type(CMat) function MatrixScaleRC(a, b) result(c)
     type(CMat), intent(in) :: b
-    complex(8), intent(in) :: a
-    integer(4) :: m, n, i
+    complex(dp), intent(in) :: a
+    integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
     call MatrixCopyC(c, b)
@@ -142,7 +143,7 @@ contains
   type(CMat) function MatrixScaleDivideC(b, a) result(c)
     type(CMat), intent(in) :: b
     real(8), intent(in) :: a
-    integer(4) :: m, n, i
+    integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
     call MatrixCopyC(c, b)
@@ -153,7 +154,7 @@ contains
 
   type(CMat) function Trans(a) result(b)
     class(CMat), intent(in) :: a
-    integer(4) :: n, m
+    integer(kp) :: n, m
     m = size(a%m, 1)
     n = size(a%m, 2)
     call b%Ini(n,m)
@@ -161,8 +162,8 @@ contains
   end function Trans
 
   type(CMat) function ComplexConjugate(a) result(b)
-  class(CMat), intent(in) :: a
-    integer(4) :: n, m
+    class(CMat), intent(in) :: a
+    integer(kp) :: n, m
     m = size(a%m, 1)
     n = size(a%m, 2)
     call b%Ini(n,m)
@@ -170,17 +171,17 @@ contains
   end function ComplexConjugate
 
   type(CMat) function HermiteConjugate(a) result(b)
-  class(CMat), intent(in) :: a
+    class(CMat), intent(in) :: a
     b = a%C()
     b = b%T()
   end function HermiteConjugate
 
   type(CMat) function inverse(r) result(s)
-  class(CMat), intent(in) :: r
-    complex(8), allocatable :: a(:,:)
-    complex(8), allocatable :: work(:)
-    integer(4), allocatable :: ipvt(:)
-    integer(4) :: info, n
+    class(CMat), intent(in) :: r
+    complex(dp), allocatable :: a(:,:)
+    complex(dp), allocatable :: work(:)
+    integer(kp), allocatable :: ipvt(:)
+    integer(kp) :: info, n
     n = size(r%m, 1)
     call s%Ini(n,n)
     allocate(work(n*n),ipvt(n))
@@ -192,11 +193,11 @@ contains
     deallocate(a,work,ipvt)
   end function inverse
 
-  complex(8) function Det(r) result(d)
-  class(CMat), intent(in) :: r
-    integer(4) :: n, i, info
-    complex(8), allocatable :: a(:,:)
-    integer(4), allocatable :: ipiv(:)
+  complex(dp) function Det(r) result(d)
+    class(CMat), intent(in) :: r
+    integer(kp) :: n, i, info
+    complex(dp), allocatable :: a(:,:)
+    integer(kp), allocatable :: ipiv(:)
     n = size(r%m, 1)
     allocate(ipiv(n), a(n,n))
     a = r%m
@@ -217,9 +218,9 @@ contains
   end function Det
 
   subroutine MatrixPrint(this, string)
-  class(CMat), intent(in) :: this
+    class(CMat), intent(in) :: this
     character(12) :: cfmt
-    integer(4) :: i, n, m
+    integer(kp) :: i, n, m
     character(*), intent(in), optional :: string
     cfmt = '( xf10.4)'
     n = size(this%m, 1)
@@ -232,27 +233,26 @@ contains
     end do
     write(*,'(a)') 'Imag:'
     do i=1,n
-      write(*,cfmt) dimag(this%m(i,:))
+      write(*,cfmt) aimag(this%m(i,:))
     end do
   end subroutine MatrixPrint
 
   function block_cmat(this, m1, m2, n1, n2) result(r)
-  class(CMat), intent(in) :: this
+    class(CMat), intent(in) :: this
     type(CMat) :: r
-    integer(4), intent(in) :: m1, m2, n1, n2
-    integer(4) :: m, n
+    integer(kp), intent(in) :: m1, m2, n1, n2
+    integer(kp) :: m, n
     m = m2 - m1 + 1
     n = n2 - n1 + 1
     call r%ini(m,n)
     r%m(:,:) = this%m(m1:m2,n1:n2)
   end function block_cmat
 
-
   subroutine GetRandomMatrix(mat, m, n)
     use VectorComplex, only: CVec
-  class(CMat), intent(inout) :: mat
-    integer(4), intent(in) :: m, n
-    integer(4) :: i
+    class(CMat), intent(inout) :: mat
+    integer(kp), intent(in) :: m, n
+    integer(kp) :: i
     type(CVec) :: v
     call mat%ini(m,n)
     do i = 1, n
@@ -264,9 +264,9 @@ contains
 
   subroutine DiagMat(b, a)
     use VectorComplex, only: CVec
-  class(CMat), intent(inout) :: b
+    class(CMat), intent(inout) :: b
     type(CVec), intent(in) :: a
-    integer(4) :: n, i
+    integer(kp) :: n, i
     n = size(a%V)
     call b%Ini(n,n)
     do i = 1, n

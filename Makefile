@@ -14,7 +14,7 @@ LIBS=-llapack -lblas
 
 OMP=-fopenmp
 FFLAGS=-O3
-#FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -Ddebug # For debug
+FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -std=f2008 -Ddebug # For debug
 
 #--------------------------------------------------
 # Source Files
