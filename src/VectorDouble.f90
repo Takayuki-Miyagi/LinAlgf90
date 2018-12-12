@@ -129,13 +129,32 @@ contains
     b = ddot(n, a%v, 1, a%v, 1)
   end function Nrm2
 
-  subroutine VectorPrint(this, string)
+  subroutine VectorPrint(this, msg, iunit, binary)
   class(DVec),intent(in)::this
-    integer(kp) :: n
-    character(*), intent(in), optional :: string
-    n = size(this%v, 1)
-    if(present(string)) write(*,*) string
-    write(*,'(10f10.4)') this%v(:)
+    integer(kp) :: i, n, unt
+    integer(kp), intent(in), optional :: iunit
+    character(*), intent(in), optional :: msg
+    logical, intent(in), optional :: binary
+    logical :: bin
+    if(present(iunit)) then; unt = iunit
+    else; unt = 6; end if
+
+    if(present(binary)) then; bin = binary
+    else; bin = .false.; end if
+
+    if(bin) then
+      write(unt) this%v
+    else
+      if(present(msg)) write(unt,*) msg
+      if(unt == 6) then
+        write(unt,'(10f10.4)') this%v(:)
+      else
+        n = size(this%v, 1)
+        do i = 1, n
+          write(unt,'(10f10.4)') this%v(i)
+        end do
+      end if
+    end if
   end subroutine VectorPrint
 
   subroutine GetRandomVector(v, n, dist)

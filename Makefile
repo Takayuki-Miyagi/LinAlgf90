@@ -24,9 +24,9 @@ MAINDIR = test
 #SRCMAIN += $(MAINDIR)/test.f90
 #SRCMAIN += $(MAINDIR)/test_DVec.f90
 #SRCMAIN += $(MAINDIR)/test_CVec.f90
-#SRCMAIN += $(MAINDIR)/test_DMat.f90
+SRCMAIN += $(MAINDIR)/test_DMat.f90
 #SRCMAIN += $(MAINDIR)/test_CMat.f90
-SRCMAIN += $(MAINDIR)/init_time.f90
+#SRCMAIN += $(MAINDIR)/init_time.f90
 #SRCMAIN += $(MAINDIR)/test_EigenSolSymD.f90
 #SRCMAIN += $(MAINDIR)/test_EigenSolHermite.f90
 
@@ -37,7 +37,7 @@ SRCF90 += $(wildcard $(SRCDIR)/*.f90)
 SRCF95 += $(wildcard $(SRCDIR)/*.F90)
 SRCS = $(SRCF90) $(SRCF95) $(MAINSRC)
 
-MODDIR = mod
+MODDIR = src
 
 OBJDIR = obj
 OBJF90 += $(SRCF90:$(SRCDIR)/%.f90=$(OBJDIR)/%.o)

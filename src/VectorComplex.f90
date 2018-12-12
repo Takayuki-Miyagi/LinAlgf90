@@ -96,7 +96,7 @@ contains
 
   type(CVec) function VectorDivideC(a, b) result(c)
     type(CVec), intent(in) :: a
-    real(8), intent(in) :: b
+    real(dp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
     call VectorCopyC(c,a)
@@ -111,10 +111,10 @@ contains
     b%v = conjg(a%v)
   end function ComplexConjugate
 
-  real(8) function InnerProductC(a, b) result(c)
+  real(dp) function InnerProductC(a, b) result(c)
     type(CVec), intent(in) :: a, b
     integer(kp) :: n
-    real(8) :: zdotu
+    real(dp) :: zdotu
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in InnerProduct'
       stop
@@ -123,33 +123,52 @@ contains
     c = zdotu(n, a%v, 1, b%v, 1)
   end function InnerProductC
 
-  real(8) function Nrm(a) result(b)
+  real(dp) function Nrm(a) result(b)
   class(CVec), intent(in) :: a
     integer(kp) :: n
-    real(8) :: dznrm2
+    real(dp) :: dznrm2
     n = size(a%v)
     b = dznrm2(n, a%v, 1)
   end function Nrm
 
-  real(8) function Nrm2(a) result(b)
+  real(dp) function Nrm2(a) result(b)
   class(CVec), intent(in) :: a
     integer(kp) :: n
-    real(8) :: dznrm2
+    real(dp) :: dznrm2
     n = size(a%v)
     b = dznrm2(n, a%v, 1) ** 2
   end function Nrm2
 
-  subroutine VectorPrint(this, string)
-  class(CVec),intent(in)::this
-    integer(kp) :: n
-    character(*), intent(in), optional :: string
-    n = size(this%v, 1)
-    if(present(string)) write(*,*) string
-    write(*,'(a)',advance='no') 'Real:'
-    write(*,'(10f10.4)') dble(this%v(:))
-    write(*,'(a)',advance='no') 'Imag:'
-    write(*,'(10f10.4)') aimag(this%v(:))
-    !write(*,*) this%v(:)
+  subroutine VectorPrint(this, msg, iunit, binary)
+    class(CVec),intent(in)::this
+    integer, intent(in), optional :: iunit
+    character(*), intent(in), optional :: msg
+    logical, intent(in), optional :: binary
+    logical :: bin
+    integer(kp) :: n, i, unt
+    if(present(iunit)) then; unt = iunit
+    else; unt = 6; end if
+
+    if(present(binary)) then; bin = binary
+    else; bin = .false.; end if
+
+    if(bin) then
+      write(unt) this%v
+    else
+      if(present(msg)) write(unt,*) msg
+      if(unt == 6) then
+        write(unt,'(a)',advance='no') 'Real:'
+        write(unt,'(10f10.4)') dble(this%v(:))
+        write(unt,'(a)',advance='no') 'Imag:'
+        write(unt,'(10f10.4)') aimag(this%v(:))
+      else
+        n = size(this%v, 1)
+        do i = 1, n
+          write(unt,'(10f10.4)') this%v(i)
+        end do
+      end if
+    end if
+
   end subroutine VectorPrint
 
   subroutine GetRandomVector(v, n, dist)

@@ -2,7 +2,8 @@ module MatrixDouble
   use LinAlgParameters
   implicit none
   private :: IniM, FinM, eye, Trans, Inverse, Det
-  private :: GetRandomMatrix, MatrixPrint, DiagMat, block_dmat
+  private :: GetRandomMatrix, MatrixPrint
+  private :: DiagMat, block_dmat
 
   public :: DMat, MatrixCopyD, MatrixProductD, MatrixSumD
   public :: MatrixSubtractD, MatrixScaleLD, MatrixScaleRD
@@ -198,19 +199,41 @@ contains
     deallocate(ipiv, a)
   end function Det
 
-  subroutine MatrixPrint(this, string)
-  class(DMat), intent(in) :: this
+  subroutine MatrixPrint(this, msg, iunit, binary)
+    class(DMat), intent(in) :: this
+    integer, intent(in), optional :: iunit
+    character(*), intent(in), optional :: msg
+    logical, intent(in), optional :: binary
+    logical :: bin
     character(12) :: cfmt
-    integer(kp) :: i, n, m
-    character(*), intent(in), optional :: string
-    cfmt = '( xf10.4)'
-    n = size(this%m, 1)
-    m = size(this%m, 2)
-    write(cfmt(2:3), '(I2)') m
-    if(present(string)) write(*,*) string
-    do i=1,n
-      write(*,cfmt) this%m(i,:)
-    end do
+    integer(kp) :: i, j, n, m
+    integer :: unt
+    if(present(iunit)) then; unt = iunit
+    else; unt = 6; end if
+
+    if(present(binary)) then; bin = binary
+    else; bin = .false.; end if
+
+    if(bin) then
+      write(unt) this%m
+    else
+      if(present(msg)) write(unt,*) msg
+      n = size(this%m, 1)
+      m = size(this%m, 2)
+      if(unt == 6) then
+        cfmt = '( xf10.4)'
+        write(cfmt(2:3), '(I2)') m
+        do i=1,n
+          write(unt,cfmt) this%m(i,:)
+        end do
+      else
+        do i=1,n
+          do j=1,m
+            write(unt,'(2i8,f14.6)') i,j,this%m(i,j)
+          end do
+        end do
+      end if
+    end if
   end subroutine MatrixPrint
 
   function block_dmat(this, m1, m2, n1, n2) result(r)
