@@ -46,6 +46,7 @@ contains
     type(DVec), intent(in) :: a
     integer(kp) :: n
     n = size(a%V)
+    if(n < 1) return
     call b%Ini(n)
     call dcopy(n, a%v, 1, b%v, 1)
   end subroutine VectorCopyD
@@ -58,6 +59,7 @@ contains
       stop
     end if
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyD(c, a)
     call daxpy(n, 1.d0, b%v, 1, c%v, 1)
   end function VectorSumD
@@ -70,6 +72,7 @@ contains
       stop
     end if
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyD(c, a)
     call daxpy(n, -1.d0, b%v, 1, c%v, 1)
   end function VectorSubtractD
@@ -79,6 +82,7 @@ contains
     real(dp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyD(c, a)
     call dscal(n, b, c%v, 1)
   end function VectorScaleRD
@@ -88,6 +92,7 @@ contains
     real(dp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyD(c, a)
     call dscal(n, b, c%v, 1)
   end function VectorScaleLD
@@ -97,6 +102,7 @@ contains
     real(dp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyD(c, a)
     call dscal(n, 1.d0 / b, c%v, 1)
   end function VectorDivideD
@@ -110,6 +116,7 @@ contains
       stop
     end if
     n = size(a%v)
+    if(n < 1) return
     c = ddot(n, a%v, 1, b%v, 1)
   end function InnerProductD
 
@@ -118,6 +125,7 @@ contains
     integer(kp) :: n
     real(dp) :: dnrm2
     n = size(a%v)
+    if(n < 1) return
     b = dnrm2(n, a%v, 1)
   end function Nrm
 
@@ -126,6 +134,7 @@ contains
     integer(kp) :: n
     real(dp) :: ddot
     n = size(a%v)
+    if(n < 1) return
     b = ddot(n, a%v, 1, a%v, 1)
   end function Nrm2
 
@@ -165,6 +174,7 @@ contains
     integer(kp), intent(in) :: n
     integer(kp), intent(in), optional :: dist
     integer(kp) :: idist = 3
+    if(n < 1) return
     if(present(dist)) idist = dist
     call v%ini(n)
     call dlarnv(idist, iseed, n, v%v)
@@ -176,6 +186,7 @@ contains
     integer(kp), intent(in) :: n1, n2
     integer(kp) :: n
     n = n2 - n1 + 1
+    if(n < 1) return
     call r%ini(n)
     r%v(:) = this%v(n1:n2)
   end function block_dvec

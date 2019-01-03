@@ -25,6 +25,7 @@ contains
   subroutine IniV(a, n)
   class(CVec), intent(inout) :: a
     integer(kp), intent(in) :: n
+    if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
   end subroutine IniV
@@ -32,6 +33,7 @@ contains
   subroutine zeros(a, n)
   class(CVec), intent(inout) :: a
     integer(kp), intent(in) :: n
+    if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
     a%V(:) = 0.d0
@@ -47,6 +49,7 @@ contains
     type(CVec), intent(in) :: a
     integer(kp) :: n
     n = size(a%V)
+    if(n < 1) return
     call b%Ini(n)
     call zcopy(n, a%v, 1, b%v, 1)
   end subroutine VectorCopyC
@@ -59,6 +62,7 @@ contains
       stop
     end if
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyC(c,a)
     call zaxpy(n, 1.d0, b%v, 1, c%v, 1)
   end function VectorSumC
@@ -71,6 +75,7 @@ contains
       stop
     end if
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyC(c,a)
     call daxpy(n, -1.d0, b%v, 1, c%v, 1)
   end function VectorSubtractC
@@ -80,6 +85,7 @@ contains
     complex(dp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyC(c,a)
     call zscal(n, b, c%v, 1)
   end function VectorScaleRC
@@ -90,6 +96,7 @@ contains
     complex(dp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyC(c,a)
     call dscal(n, b, c%v, 1)
   end function VectorScaleLC
@@ -99,6 +106,7 @@ contains
     real(dp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
+    if(n < 1) return
     call VectorCopyC(c,a)
     call zdscal(n, 1.d0 / b, c%v, 1)
   end function VectorDivideC
@@ -107,6 +115,7 @@ contains
   class(CVec), intent(in) :: a
     integer(kp) :: n
     n = size(a%v)
+    if(n < 1) return
     call b%ini(n)
     b%v = conjg(a%v)
   end function ComplexConjugate
@@ -120,6 +129,7 @@ contains
       stop
     end if
     n = size(a%v)
+    if(n < 1) return
     c = zdotu(n, a%v, 1, b%v, 1)
   end function InnerProductC
 
@@ -128,6 +138,7 @@ contains
     integer(kp) :: n
     real(dp) :: dznrm2
     n = size(a%v)
+    if(n < 1) return
     b = dznrm2(n, a%v, 1)
   end function Nrm
 
@@ -136,6 +147,7 @@ contains
     integer(kp) :: n
     real(dp) :: dznrm2
     n = size(a%v)
+    if(n < 1) return
     b = dznrm2(n, a%v, 1) ** 2
   end function Nrm2
 
@@ -181,6 +193,7 @@ contains
     integer(kp), intent(in) :: n
     integer(kp), intent(in), optional :: dist
     integer(kp) :: idist = 4
+    if(n < 1) return
     if(present(dist)) idist = dist
     call v%ini(n)
     call zlarnv(idist, iseed, n, v%v)
@@ -192,6 +205,7 @@ contains
     integer(kp), intent(in) :: n1, n2
     integer(kp) :: n
     n = n2 - n1 + 1
+    if(n < 1) return
     call r%ini(n)
     r%v(:) = this%v(n1:n2)
   end function block_cvec

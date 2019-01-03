@@ -28,6 +28,7 @@ contains
   subroutine iniM(a, m, n)
   class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: m,n
+    if(m < 1 .or. n < 1) return
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(m,n))
   end subroutine iniM
@@ -35,6 +36,7 @@ contains
   subroutine zeros(a, m, n)
   class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: m,n
+    if(m < 1 .or. n < 1) return
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(m,n))
     a%m = 0.d0
@@ -44,6 +46,7 @@ contains
   class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: n
     integer(kp) :: i
+    if(n < 1) return
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(n,n))
     a%m = 0.d0
@@ -63,6 +66,7 @@ contains
     integer(kp) :: m, n, i
     m = size(a%m, 1)
     n = size(a%m, 2)
+    if(m < 1 .or. n < 1) return
     call b%Ini(m,n)
     do i = 1, n
       call dcopy(m, a%m(:,i), 1, b%m(:,i), 1)
@@ -79,6 +83,7 @@ contains
       stop
     end if
     n = size(b%m, 2)
+    if(m < 1 .or. n < 1) return
     call c%Ini(m,n)
     call dgemm('n','n',m,n,k,1.d0,a%m,m,b%m,k,0.d0,c%m,m)
   end function MatrixProductD
@@ -92,6 +97,7 @@ contains
     end if
     m = size(a%m, 1)
     n = size(a%m, 2)
+    if(m < 1 .or. n < 1) return
     call MatrixCopyD(c, a)
     do i = 1, n
       call daxpy(m, 1.d0, b%m(:,i), 1, c%m(:,i), 1)
@@ -107,6 +113,7 @@ contains
     end if
     m = size(a%m, 1)
     n = size(a%m, 2)
+    if(m < 1 .or. n < 1) return
     call MatrixCopyD(c, a)
     do i = 1, n
       call daxpy(m, -1.d0, b%m(:,i), 1, c%m(:,i), 1)
@@ -119,6 +126,7 @@ contains
     integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
+    if(m < 1 .or. n < 1) return
     call MatrixCopyD(c, b)
     do i = 1, n
       call dscal(m, a, c%m(:,i), 1)
@@ -131,6 +139,7 @@ contains
     integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
+    if(m < 1 .or. n < 1) return
     call MatrixCopyD(c, b)
     do i = 1, n
       call dscal(m, a, c%m(:,i), 1)
@@ -143,6 +152,7 @@ contains
     integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
+    if(m < 1 .or. n < 1) return
     call MatrixCopyD(c, b)
     do i = 1, n
       call dscal(m, 1.d0 / a, c%m(:,i), 1)
@@ -154,6 +164,7 @@ contains
     integer(kp) :: n, m
     m = size(a%m, 1)
     n = size(a%m, 2)
+    if(m < 1 .or. n < 1) return
     call b%Ini(n,m)
     b%M = transpose(a%M)
   end function Trans
@@ -165,6 +176,7 @@ contains
     integer(kp), allocatable :: ipvt(:)
     integer(kp) :: info, n
     n = size(r%m, 1)
+    if(n < 1) return
     call s%Ini(n,n)
     allocate(work(n*n),ipvt(n))
     allocate(a(n,n))
@@ -181,6 +193,7 @@ contains
     real(dp), allocatable :: a(:,:)
     integer(kp), allocatable :: ipiv(:)
     n = size(r%m, 1)
+    if(n < 1) return
     allocate(ipiv(n), a(n,n))
     a = r%m
     call dgetrf(n, n, a, n, ipiv, info)
@@ -243,6 +256,7 @@ contains
     integer(kp) :: m, n
     m = m2 - m1 + 1
     n = n2 - n1 + 1
+    if(m < 1 .or. n < 1) return
     call r%ini(m,n)
     r%m(:,:) = this%m(m1:m2,n1:n2)
   end function block_dmat
@@ -254,6 +268,7 @@ contains
     integer(kp) :: i
     type(DVec) :: v
     call mat%ini(m,n)
+    if(m < 1 .or. n < 1) return
     do i = 1, n
       call v%Random(m)
       mat%m(:,i) = v%v(:)
@@ -267,6 +282,7 @@ contains
     type(DVec), intent(in) :: a
     integer(kp) :: n, i
     n = size(a%V)
+    if(n < 1) return
     call b%Ini(n,n)
     do i = 1, n
       b%M(i,i) = a%V(i)
