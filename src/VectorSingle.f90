@@ -1,58 +1,59 @@
-module VectorDouble
+module VectorSingle
   use LinAlgParameters
   implicit none
 
+  public :: SVec, VectorCopyS, VectorSumS, VectorSubtractS
+  public :: VectorScaleRS, VectorScaleLS, VectorDivideS, InnerProductS
+
+
   private :: IniV, FinV, VectorPrint, GetRandomVector, Nrm, Nrm2
-  private :: block_dvec
+  private :: block_svec
 
-  public :: DVec, VectorCopyD, VectorSumD, VectorSubtractD
-  public :: VectorScaleRD, VectorScaleLD, VectorDivideD, InnerProductD
-
-  type :: DVec
-    real(dp), allocatable :: V(:)
+  type :: SVec
+    real(sp), allocatable :: V(:)
   contains
     procedure :: Ini => iniV
     procedure :: zeros
     procedure :: Fin => FinV
     procedure :: prt => VectorPrint
     procedure :: Random => GetRandomVector
-    procedure :: blk => block_dvec
+    procedure :: blk => block_svec
     procedure :: Nrm
     procedure :: Nrm2
-  end type DVec
+  end type SVec
 contains
   subroutine IniV(a, n)
-    class(DVec), intent(inout) :: a
+    class(SVec), intent(inout) :: a
     integer(kp), intent(in) :: n
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
   end subroutine IniV
 
   subroutine zeros(a, n)
-    class(DVec), intent(inout) :: a
+    class(SVec), intent(inout) :: a
     integer(kp), intent(in) :: n
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
-    a%v(:) = 0.d0
+    a%v(:) = 0.0
   end subroutine zeros
 
   subroutine FinV(a)
-    class(DVec), intent(inout) :: a
+    class(SVec), intent(inout) :: a
     if(allocated(a%V)) deallocate(a%V)
   end subroutine FinV
 
-  subroutine VectorCopyD(b, a)
-    type(DVec), intent(inout) :: b
-    type(DVec), intent(in) :: a
+  subroutine VectorCopyS(b, a)
+    type(SVec), intent(inout) :: b
+    type(SVec), intent(in) :: a
     integer(kp) :: n
     n = size(a%V)
     if(n < 1) return
     call b%Ini(n)
-    call dcopy(n, a%v, 1, b%v, 1)
-  end subroutine VectorCopyD
+    call scopy(n, a%v, 1, b%v, 1)
+  end subroutine VectorCopyS
 
-  type(DVec) function VectorSumD(a, b) result(c)
-    type(DVec), intent(in) :: a, b
+  type(SVec) function VectorSumS(a, b) result(c)
+    type(SVec), intent(in) :: a, b
     integer(kp) :: n
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in DVectorSum'
@@ -60,89 +61,89 @@ contains
     end if
     n = size(a%v)
     if(n < 1) return
-    call VectorCopyD(c, a)
-    call daxpy(n, 1.d0, b%v, 1, c%v, 1)
-  end function VectorSumD
+    call VectorCopyS(c, a)
+    call saxpy(n, 1.0, b%v, 1, c%v, 1)
+  end function VectorSumS
 
-  type(DVec) function VectorSubtractD(a, b) result(c)
-    type(DVec), intent(in) :: a, b
+  type(SVec) function VectorSubtractS(a, b) result(c)
+    type(SVec), intent(in) :: a, b
     integer(kp) :: n
     if(size(a%v) /= size(b%v)) then
-      write(*,'(a)') 'Error in DVectorSubtract'
+      write(*,'(a)') 'Error in SVectorSubtract'
       stop
     end if
     n = size(a%v)
     if(n < 1) return
-    call VectorCopyD(c, a)
-    call daxpy(n, -1.d0, b%v, 1, c%v, 1)
-  end function VectorSubtractD
+    call VectorCopyS(c, a)
+    call saxpy(n, -1.0, b%v, 1, c%v, 1)
+  end function VectorSubtractS
 
-  type(DVec) function VectorScaleRD(a, b) result(c)
-    type(DVec), intent(in) :: a
-    real(dp), intent(in) :: b
+  type(SVec) function VectorScaleRS(a, b) result(c)
+    type(SVec), intent(in) :: a
+    real(sp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
     if(n < 1) return
-    call VectorCopyD(c, a)
-    call dscal(n, b, c%v, 1)
-  end function VectorScaleRD
+    call VectorCopyS(c, a)
+    call sscal(n, b, c%v, 1)
+  end function VectorScaleRS
 
-  type(DVec) function VectorScaleLD(b, a) result(c)
-    type(DVec), intent(in) :: a
-    real(dp), intent(in) :: b
+  type(SVec) function VectorScaleLS(b, a) result(c)
+    type(SVec), intent(in) :: a
+    real(sp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
     if(n < 1) return
-    call VectorCopyD(c, a)
-    call dscal(n, b, c%v, 1)
-  end function VectorScaleLD
+    call VectorCopyS(c, a)
+    call sscal(n, b, c%v, 1)
+  end function VectorScaleLS
 
-  type(DVec) function VectorDivideD(a, b) result(c)
-    type(DVec), intent(in) :: a
-    real(dp), intent(in) :: b
+  type(SVec) function VectorDivideS(a, b) result(c)
+    type(SVec), intent(in) :: a
+    real(sp), intent(in) :: b
     integer(kp) :: n
     n = size(a%v)
     if(n < 1) return
-    call VectorCopyD(c, a)
-    call dscal(n, 1.d0 / b, c%v, 1)
-  end function VectorDivideD
+    call VectorCopyS(c, a)
+    call sscal(n, 1.0 / b, c%v, 1)
+  end function VectorDivideS
 
-  real(dp) function InnerProductD(a, b) result(c)
-    type(DVec), intent(in) :: a, b
+  real(sp) function InnerProductS(a, b) result(c)
+    type(SVec), intent(in) :: a, b
     integer(kp) :: n
-    real(dp) :: ddot
+    real(sp) :: sdot
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in InnerProduct'
       stop
     end if
+    c = 0.0
     n = size(a%v)
-    c = 0.d0
     if(n < 1) return
-    c = ddot(n, a%v, 1, b%v, 1)
-  end function InnerProductD
+    c = sdot(n, a%v, 1, b%v, 1)
+  end function InnerProductS
 
-  real(dp) function Nrm(a) result(b)
-    class(DVec), intent(in) :: a
+  real(sp) function Nrm(a) result(b)
+    class(SVec), intent(in) :: a
     integer(kp) :: n
-    real(dp) :: dnrm2
-    b = 0.d0
+    real(sp) :: snrm2
+    b = 0.0
     n = size(a%v)
     if(n < 1) return
-    b = dnrm2(n, a%v, 1)
+    b = snrm2(n, a%v, 1)
   end function Nrm
 
-  real(dp) function Nrm2(a) result(b)
-    class(DVec), intent(in) :: a
+  real(sp) function Nrm2(a) result(b)
+    class(SVec), intent(in) :: a
     integer(kp) :: n
-    real(dp) :: ddot
-    b = 0.d0
+    real(sp) :: sdot
+    b = 0.0
     n = size(a%v)
     if(n < 1) return
-    b = ddot(n, a%v, 1, a%v, 1)
+    b = sdot(n, a%v, 1, a%v, 1)
   end function Nrm2
 
   subroutine VectorPrint(this, msg, iunit, binary)
-    class(DVec),intent(in)::this
+    class(SVec),intent(in)::this
     integer(kp) :: i, n, unt
     integer(kp), intent(in), optional :: iunit
     character(*), intent(in), optional :: msg
@@ -174,24 +175,24 @@ contains
     ! idist = 1: uniform (0, 1)
     ! idist = 2: uniform (-1, 1)
     ! idist = 3: normal (-1, 1)
-    class(DVec), intent(inout) :: v
+    class(SVec), intent(inout) :: v
     integer(kp), intent(in) :: n
     integer(kp), intent(in), optional :: dist
     integer(kp) :: idist = 3
     if(n < 1) return
     if(present(dist)) idist = dist
     call v%ini(n)
-    call dlarnv(idist, iseed, n, v%v)
+    call slarnv(idist, iseed, n, v%v)
   end subroutine GetRandomVector
 
-  function block_dvec(this, n1, n2) result(r)
-    class(DVec), intent(in) :: this
-    type(DVec) :: r
+  function block_SVec(this, n1, n2) result(r)
+    class(SVec), intent(in) :: this
+    type(SVec) :: r
     integer(kp), intent(in) :: n1, n2
     integer(kp) :: n
     n = n2 - n1 + 1
     if(n < 1) return
     call r%ini(n)
     r%v(:) = this%v(n1:n2)
-  end function block_dvec
-end module VectorDouble
+  end function block_SVec
+end module VectorSingle

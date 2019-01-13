@@ -1,84 +1,115 @@
 module LinAlgLib
   use LinAlgParameters
+  use SingleDouble
+  use VectorSingle, only: SVec, VectorCopyS, VectorSumS, VectorSubtractS, &
+      & VectorScaleRS, VectorScaleLS, InnerProductS, VectorDivideS
   use VectorDouble, only: DVec, VectorCopyD, VectorSumD, VectorSubtractD, &
-    & VectorScaleRD, VectorScaleLD, InnerProductD, VectorDivideD
+      & VectorScaleRD, VectorScaleLD, InnerProductD, VectorDivideD
   use VectorComplex, only: CVec, VectorCopyC, VectorSumC, VectorSubtractC, &
-    & VectorScaleRC, VectorScaleLC, InnerProductC, VectorDivideC
+      & VectorScaleRC, VectorScaleLC, InnerProductC, VectorDivideC
+  use MatrixSingle, only: SMat, MatrixCopyS, MatrixSumS, MatrixSubtractS, &
+      & MatrixScaleRS, MatrixScaleLS, MatrixProductS, MatrixScaleDivideS
   use MatrixDouble, only: DMat, MatrixCopyD, MatrixSumD, MatrixSubtractD, &
-    & MatrixScaleRD, MatrixScaleLD, MatrixProductD, MatrixScaleDivideD
+      & MatrixScaleRD, MatrixScaleLD, MatrixProductD, MatrixScaleDivideD
   use MatrixComplex, only: CMat, MatrixCopyC, MatrixSumC, MatrixSubtractC, &
-    & MatrixScaleRC, MatrixScaleLC, MatrixProductC, MatrixScaleDivideC
+      & MatrixScaleRC, MatrixScaleLC, MatrixProductC, MatrixScaleDivideC
+  use MatVecSingle, only: OuterProductS, VMProductS, MVProductS
   use MatVecDouble, only: OuterProductD, VMProductD, MVProductD
   use MatVecComplex, only: OuterProductC, VMProductC, MVProductC
 
   implicit none
-  private :: VectorCopyD, VectorCopyC, MatrixCopyD, MatrixCopyC
-  private :: VectorSumD, VectorSumC, MatrixSumD, MatrixSumC
-  private :: VectorSubtractD, VectorSubtractC, MatrixSubtractD, MatrixSubtractC
-  private :: VectorScaleRD, VectorScaleRC, VectorScaleLD, VectorScaleLC, InnerProductD
-  private :: InnerProductC, MatrixScaleLC, MatrixScaleLD, MatrixScaleRC, MatrixScaleRD
-  private :: MatrixProductC, MatrixProductD, MVProductD,  VMProductD, MVProductC, VMProductC
-  private :: VectorDivideD, VectorDivideC, MatrixScaleDivideD, MatrixScaleDivideC
-  private :: OuterProductD, OuterProductC, InitEigenSolSymD, FinEigenSolSymD, DiagSymD, EigenvalD
-  private :: InitEigenSolHermite, FinEigenSolHermite, DiagHermite!, EigenvalHermite
 
   public :: assignment(=), operator(+), operator(-), operator(*)
   public :: operator(/), operator(.x.), EigenSolSymD, EigenSolHermite, exp
 
+  private :: DVec2SVec, SVec2DVec, SMat2DMat, DMat2SMat
+  private :: VectorCopyS, VectorCopyD, VectorCopyC, MatrixCopyS, MatrixCopyD, MatrixCopyC
+  private :: VectorSumS, VectorSumD, VectorSumC, MatrixSumS, MatrixSumD, MatrixSumC
+  private :: VectorSubtractS, VectorSubtractD, VectorSubtractC, MatrixSubtractS, MatrixSubtractD, MatrixSubtractC
+  private :: VectorScaleRS, VectorScaleRD, VectorScaleRC, VectorScaleLS, VectorScaleLD, VectorScaleLC
+  private :: InnerProductS, InnerProductD
+  private :: InnerProductC, MatrixScaleLC
+  private :: MatrixScaleLS, MatrixScaleLD, MatrixScaleRC, MatrixScaleRS, MatrixScaleRD
+  private :: MatrixProductC, MatrixProductD, MatrixProductS
+  private :: MVProductS, MVProductD,  VMProductS, VMProductD, MVProductC, VMProductC
+  private :: VectorDivideS, MatrixScaleDivideS
+  private :: VectorDivideD, VectorDivideC, MatrixScaleDivideD, MatrixScaleDivideC
+  private :: OuterProductS
+  private :: OuterProductD, OuterProductC, InitEigenSolSymD, FinEigenSolSymD, DiagSymD, EigenvalD
+  private :: InitEigenSolHermite, FinEigenSolHermite, DiagHermite!, EigenvalHermite
+
+
   interface assignment(=)
-    module procedure :: VectorCopyD, &
-      & VectorCopyC, &
-      & MatrixCopyD, &
-      & MatrixCopyC
+    procedure :: VectorCopyD, &
+        & VectorCopyS, &
+        & VectorCopyC, &
+        & MatrixCopyS, &
+        & MatrixCopyD, &
+        & MatrixCopyC
   end interface assignment(=)
 
   interface operator(+)
-    module procedure :: VectorSumD, &
-      & VectorSumC, &
-      & MatrixSumD, &
-      & MatrixSumC
+    procedure :: VectorSumD, &
+        & VectorSumS, &
+        & VectorSumC, &
+        & MatrixSumS, &
+        & MatrixSumD, &
+        & MatrixSumC
   end interface operator(+)
 
   interface operator(-)
-    module procedure :: VectorSubtractD, &
-      & VectorSubtractC, &
-      & MatrixSubtractD, &
-      & MatrixSubtractC
+    procedure :: VectorSubtractD, &
+        & VectorSubtractS, &
+        & VectorSubtractC, &
+        & MatrixSubtractS, &
+        & MatrixSubtractD, &
+        & MatrixSubtractC
   end interface operator(-)
 
   interface operator(*)
-    module procedure :: VectorScaleRD, &
-      & VectorScaleRC, &
-      & VectorScaleLD, &
-      & VectorScaleLC, &
-      & InnerProductD, &
-      & InnerProductC, &
-      & MatrixScaleLC, &
-      & MatrixScaleLD, &
-      & MatrixScaleRC, &
-      & MatrixScaleRD, &
-      & MatrixProductC,&
-      & MatrixProductD,&
-      & MVProductD   , &
-      & VMProductD   , &
-      & MVProductC   , &
-      & VMProductC
+    procedure :: VectorScaleRD, &
+        & VectorScaleRS, &
+        & VectorScaleRC, &
+        & VectorScaleLS, &
+        & VectorScaleLD, &
+        & VectorScaleLC, &
+        & InnerProductS, &
+        & InnerProductD, &
+        & InnerProductC, &
+        & MatrixScaleLS, &
+        & MatrixScaleLC, &
+        & MatrixScaleLD, &
+        & MatrixScaleRS, &
+        & MatrixScaleRC, &
+        & MatrixScaleRD, &
+        & MatrixProductS,&
+        & MatrixProductC,&
+        & MatrixProductD,&
+        & MVProductS   , &
+        & VMProductS   , &
+        & MVProductD   , &
+        & VMProductD   , &
+        & MVProductC   , &
+        & VMProductC
   end interface operator(*)
 
   interface operator(/)
-    module procedure :: VectorDivideD, &
-      & VectorDivideC, &
-      & MatrixScaleDivideD, &
-      & MatrixScaleDivideC
+    procedure :: VectorDivideD, &
+        & VectorDivideS, &
+        & VectorDivideC, &
+        & MatrixScaleDivideS, &
+        & MatrixScaleDivideD, &
+        & MatrixScaleDivideC
   end interface operator(/)
 
   interface operator(.x.)
-    module procedure :: OuterProductD, &
-      & OuterProductC
+    procedure :: OuterProductD, &
+        & OuterProductS, &
+        & OuterProductC
   end interface operator(.x.)
 
   interface exp
-    module procedure :: ExpD, ExpC
+    procedure :: ExpD, ExpC
   end interface exp
 
   type :: EigenSolSymD
@@ -246,12 +277,13 @@ contains
     call this%vec%fin()
   end subroutine FinEigenSolHermite
 
-  subroutine DiagHermite(this, A, qmin, qmax, m, error)
+  !subroutine DiagHermite(this, A, qmin, qmax, m, error)
+  subroutine DiagHermite(this, A, qmin, qmax, m)
     class(EigenSolHermite) :: this
     type(CMat), intent(in) :: A
     real(dp), intent(in), optional :: qmin, qmax
     integer(kp), intent(in), optional :: m
-    integer(kp), intent(in), optional :: error
+    !integer(kp), intent(in), optional :: error
     complex(dp), allocatable :: work(:)
     real(dp), allocatable :: rwork(:)
     integer(kp) :: info, lwork, n
@@ -260,6 +292,7 @@ contains
     this%vec = A
 
     if(.not. present(m) .and. .not. present(qmin) .and. .not. present(qmax)) then
+
       !
       ! solve all eigen values and eigen vectors
       !
@@ -289,41 +322,41 @@ contains
       !  deallocate(rcondz, zerrbd)
       !end if
 
-    !elseif(present(m)) then
-    !  !
-    !  ! solve lowest m eigen values and eigen vectors
-    !  !
-    !  this%eig%v(:) = 0.d0
-    !  allocate(mat(n,n))
-    !  allocate(iwork(5*n), ifailv(n))
-    !  mat = A%m
-    !  call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
-    !      &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
-    !  lwork = int(lw)
-    !  allocate(work(1:lwork))
-    !  call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
-    !      &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
-    !  this%vec%m(:,num+1:n) = 0.d0
-    !  deallocate( iwork, ifailv, work, mat)
+      !elseif(present(m)) then
+      !  !
+      !  ! solve lowest m eigen values and eigen vectors
+      !  !
+      !  this%eig%v(:) = 0.d0
+      !  allocate(mat(n,n))
+      !  allocate(iwork(5*n), ifailv(n))
+      !  mat = A%m
+      !  call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
+      !      &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+      !  lwork = int(lw)
+      !  allocate(work(1:lwork))
+      !  call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
+      !      &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
+      !  this%vec%m(:,num+1:n) = 0.d0
+      !  deallocate( iwork, ifailv, work, mat)
 
-    !elseif(present(qmin) .and. present(qmax)) then
-    !  !
-    !  ! solve eigen values in (qmin, qmax) and
-    !  ! corrsponding eigen vectors
-    !  !
+      !elseif(present(qmin) .and. present(qmax)) then
+      !  !
+      !  ! solve eigen values in (qmin, qmax) and
+      !  ! corrsponding eigen vectors
+      !  !
 
-    !  allocate(mat(n,n))
-    !  allocate(iwork(5*n), ifailv(n))
-    !  mat = A%m
-    !  this%eig%v(:) = 0.d0
-    !  call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
-    !      &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
-    !  lwork = int(lw)
-    !  allocate(work(1:lwork))
-    !  call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
-    !      &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
-    !  this%vec%m(:,num+1:n) = 0.d0
-    !  deallocate( iwork, ifailv, work, mat )
+      !  allocate(mat(n,n))
+      !  allocate(iwork(5*n), ifailv(n))
+      !  mat = A%m
+      !  this%eig%v(:) = 0.d0
+      !  call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
+      !      &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+      !  lwork = int(lw)
+      !  allocate(work(1:lwork))
+      !  call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
+      !      &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
+      !  this%vec%m(:,num+1:n) = 0.d0
+      !  deallocate( iwork, ifailv, work, mat )
     end if
   end subroutine DiagHermite
 

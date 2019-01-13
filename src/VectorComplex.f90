@@ -23,7 +23,7 @@ module VectorComplex
   end type CVec
 contains
   subroutine IniV(a, n)
-  class(CVec), intent(inout) :: a
+    class(CVec), intent(inout) :: a
     integer(kp), intent(in) :: n
     if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
@@ -31,7 +31,7 @@ contains
   end subroutine IniV
 
   subroutine zeros(a, n)
-  class(CVec), intent(inout) :: a
+    class(CVec), intent(inout) :: a
     integer(kp), intent(in) :: n
     if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
@@ -40,7 +40,7 @@ contains
   end subroutine zeros
 
   subroutine FinV(a)
-  class(CVec), intent(inout) :: a
+    class(CVec), intent(inout) :: a
     if(allocated(a%V)) deallocate(a%V)
   end subroutine FinV
 
@@ -112,7 +112,7 @@ contains
   end function VectorDivideC
 
   type(CVec) function ComplexConjugate(a) result(b)
-  class(CVec), intent(in) :: a
+    class(CVec), intent(in) :: a
     integer(kp) :: n
     n = size(a%v)
     if(n < 1) return
@@ -124,6 +124,7 @@ contains
     type(CVec), intent(in) :: a, b
     integer(kp) :: n
     real(dp) :: zdotu
+    c = 0.d0
     if(size(a%v) /= size(b%v)) then
       write(*,'(a)') 'Error in InnerProduct'
       stop
@@ -134,19 +135,21 @@ contains
   end function InnerProductC
 
   real(dp) function Nrm(a) result(b)
-  class(CVec), intent(in) :: a
+    class(CVec), intent(in) :: a
     integer(kp) :: n
     real(dp) :: dznrm2
+    b = 0.d0
     n = size(a%v)
     if(n < 1) return
     b = dznrm2(n, a%v, 1)
   end function Nrm
 
   real(dp) function Nrm2(a) result(b)
-  class(CVec), intent(in) :: a
+    class(CVec), intent(in) :: a
     integer(kp) :: n
     real(dp) :: dznrm2
     n = size(a%v)
+    b = 0.d0
     if(n < 1) return
     b = dznrm2(n, a%v, 1) ** 2
   end function Nrm2
@@ -189,7 +192,7 @@ contains
     ! idist = = 3:  real and imaginary parts each normal (0,1)
     ! idist = = 4:  uniformly distributed on the disc abs(z) < 1
     ! idist = = 5:  uniformly distributed on the circle abs(z) = 1
-  class(CVec), intent(inout) :: v
+    class(CVec), intent(inout) :: v
     integer(kp), intent(in) :: n
     integer(kp), intent(in), optional :: dist
     integer(kp) :: idist = 4
@@ -200,7 +203,7 @@ contains
   end subroutine GetRandomVector
 
   function block_cvec(this, n1, n2) result(r)
-  class(CVec), intent(in) :: this
+    class(CVec), intent(in) :: this
     type(CVec) :: r
     integer(kp), intent(in) :: n1, n2
     integer(kp) :: n

@@ -22,9 +22,11 @@ FDFLAGS=-fbounds-check -Wall -fbacktrace -O -Wuninitialized -std=f2008 -Ddebug #
 
 MAINDIR = test
 #SRCMAIN += $(MAINDIR)/test.f90
+#SRCMAIN += $(MAINDIR)/test_SVec.f90
 #SRCMAIN += $(MAINDIR)/test_DVec.f90
 #SRCMAIN += $(MAINDIR)/test_CVec.f90
-SRCMAIN += $(MAINDIR)/test_DMat.f90
+SRCMAIN += $(MAINDIR)/test_SMat.f90
+#SRCMAIN += $(MAINDIR)/test_DMat.f90
 #SRCMAIN += $(MAINDIR)/test_CMat.f90
 #SRCMAIN += $(MAINDIR)/init_time.f90
 #SRCMAIN += $(MAINDIR)/test_EigenSolSymD.f90

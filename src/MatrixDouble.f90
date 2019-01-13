@@ -26,7 +26,7 @@ module MatrixDouble
   end type DMat
 contains
   subroutine iniM(a, m, n)
-  class(DMat), intent(inout) :: a
+    class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: m,n
     if(m < 1 .or. n < 1) return
     if(allocated(a%m)) deallocate(a%m)
@@ -34,7 +34,7 @@ contains
   end subroutine iniM
 
   subroutine zeros(a, m, n)
-  class(DMat), intent(inout) :: a
+    class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: m,n
     if(m < 1 .or. n < 1) return
     if(allocated(a%m)) deallocate(a%m)
@@ -43,7 +43,7 @@ contains
   end subroutine zeros
 
   subroutine eye(a, n)
-  class(DMat), intent(inout) :: a
+    class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: n
     integer(kp) :: i
     if(n < 1) return
@@ -56,7 +56,7 @@ contains
   end subroutine eye
 
   subroutine FinM(a)
-  class(DMat), intent(inout) :: a
+    class(DMat), intent(inout) :: a
     if(allocated(a%m)) deallocate(a%m)
   end subroutine FinM
 
@@ -170,7 +170,7 @@ contains
   end function Trans
 
   type(DMat) function inverse(r) result(s)
-  class(DMat), intent(in) :: r
+    class(DMat), intent(in) :: r
     real(dp), allocatable :: a(:,:)
     real(dp), allocatable :: work(:)
     integer(kp), allocatable :: ipvt(:)
@@ -188,10 +188,12 @@ contains
   end function inverse
 
   real(dp) function Det(r) result(d)
-  class(DMat), intent(in) :: r
+    class(DMat), intent(in) :: r
     integer(kp) :: n, i, info
     real(dp), allocatable :: a(:,:)
     integer(kp), allocatable :: ipiv(:)
+
+    d = 0.d0
     n = size(r%m, 1)
     if(n < 1) return
     allocate(ipiv(n), a(n,n))
@@ -221,6 +223,7 @@ contains
     character(12) :: cfmt
     integer(kp) :: i, j, n, m
     integer :: unt
+
     if(present(iunit)) then; unt = iunit
     else; unt = 6; end if
 
@@ -250,7 +253,7 @@ contains
   end subroutine MatrixPrint
 
   function block_dmat(this, m1, m2, n1, n2) result(r)
-  class(DMat), intent(in) :: this
+    class(DMat), intent(in) :: this
     type(DMat) :: r
     integer(kp), intent(in) :: m1, m2, n1, n2
     integer(kp) :: m, n
@@ -263,7 +266,7 @@ contains
 
   subroutine GetRandomMatrix(mat, m, n)
     use VectorDouble, only: DVec
-  class(DMat), intent(inout) :: mat
+    class(DMat), intent(inout) :: mat
     integer(kp), intent(in) :: m, n
     integer(kp) :: i
     type(DVec) :: v
@@ -278,7 +281,7 @@ contains
 
   subroutine DiagMat(b, a)
     use VectorDouble, only: DVec
-  class(DMat), intent(inout) :: b
+    class(DMat), intent(inout) :: b
     type(DVec), intent(in) :: a
     integer(kp) :: n, i
     n = size(a%V)
