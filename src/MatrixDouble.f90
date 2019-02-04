@@ -1,13 +1,27 @@
 module MatrixDouble
   use LinAlgParameters
   implicit none
-  private :: IniM, FinM, eye, Trans, Inverse, Det
-  private :: GetRandomMatrix, MatrixPrint
-  private :: DiagMat, block_dmat
-
-  public :: DMat, MatrixCopyD, MatrixProductD, MatrixSumD
-  public :: MatrixSubtractD, MatrixScaleLD, MatrixScaleRD
+  public :: DMat
+  public :: MatrixCopyD
+  public :: MatrixProductD
+  public :: MatrixSumD
+  public :: MatrixSubtractD
+  public :: MatrixScaleLD
+  public :: MatrixScaleRD
   public :: MatrixScaleDivideD
+
+  private :: IniM
+  private :: FinM
+  private :: zeros
+  private :: eye
+  private :: Trans
+  private :: Inverse
+  private :: Det
+  private :: GetRandomMatrix
+  private :: MatrixPrint
+  private :: DiagMat
+  private :: block_dmat
+
 
   type :: DMat
     real(dp), allocatable :: M(:,:)

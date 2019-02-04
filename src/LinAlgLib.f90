@@ -1,111 +1,177 @@
 module LinAlgLib
   use LinAlgParameters
   use SingleDouble
-  use VectorSingle, only: SVec, VectorCopyS, VectorSumS, VectorSubtractS, &
-      & VectorScaleRS, VectorScaleLS, InnerProductS, VectorDivideS
-  use VectorDouble, only: DVec, VectorCopyD, VectorSumD, VectorSubtractD, &
-      & VectorScaleRD, VectorScaleLD, InnerProductD, VectorDivideD
-  use VectorComplex, only: CVec, VectorCopyC, VectorSumC, VectorSubtractC, &
-      & VectorScaleRC, VectorScaleLC, InnerProductC, VectorDivideC
-  use MatrixSingle, only: SMat, MatrixCopyS, MatrixSumS, MatrixSubtractS, &
-      & MatrixScaleRS, MatrixScaleLS, MatrixProductS, MatrixScaleDivideS
-  use MatrixDouble, only: DMat, MatrixCopyD, MatrixSumD, MatrixSubtractD, &
-      & MatrixScaleRD, MatrixScaleLD, MatrixProductD, MatrixScaleDivideD
-  use MatrixComplex, only: CMat, MatrixCopyC, MatrixSumC, MatrixSubtractC, &
-      & MatrixScaleRC, MatrixScaleLC, MatrixProductC, MatrixScaleDivideC
-  use MatVecSingle, only: OuterProductS, VMProductS, MVProductS
-  use MatVecDouble, only: OuterProductD, VMProductD, MVProductD
-  use MatVecComplex, only: OuterProductC, VMProductC, MVProductC
+  use VectorSingle
+  use VectorDouble
+  use VectorComplex
+  use MatrixSingle
+  use MatrixDouble
+  use MatrixComplex
+  use MatVecSingle
+  use MatVecDouble
+  use MatVecComplex
 
   implicit none
 
-  public :: assignment(=), operator(+), operator(-), operator(*)
-  public :: operator(/), operator(.x.), EigenSolSymD, EigenSolHermite, exp
+  public :: assignment(=)
+  public :: operator(+)
+  public :: operator(-)
+  public :: operator(*)
+  public :: operator(/)
+  public :: operator(.x.)
+  public :: EigenSolSymD
+  public :: EigenSolHermite
+  public :: exp
 
-  private :: DVec2SVec, SVec2DVec, SMat2DMat, DMat2SMat
-  private :: VectorCopyS, VectorCopyD, VectorCopyC, MatrixCopyS, MatrixCopyD, MatrixCopyC
-  private :: VectorSumS, VectorSumD, VectorSumC, MatrixSumS, MatrixSumD, MatrixSumC
-  private :: VectorSubtractS, VectorSubtractD, VectorSubtractC, MatrixSubtractS, MatrixSubtractD, MatrixSubtractC
-  private :: VectorScaleRS, VectorScaleRD, VectorScaleRC, VectorScaleLS, VectorScaleLD, VectorScaleLC
-  private :: InnerProductS, InnerProductD
-  private :: InnerProductC, MatrixScaleLC
-  private :: MatrixScaleLS, MatrixScaleLD, MatrixScaleRC, MatrixScaleRS, MatrixScaleRD
-  private :: MatrixProductC, MatrixProductD, MatrixProductS
-  private :: MVProductS, MVProductD,  VMProductS, VMProductD, MVProductC, VMProductC
-  private :: VectorDivideS, MatrixScaleDivideS
-  private :: VectorDivideD, VectorDivideC, MatrixScaleDivideD, MatrixScaleDivideC
+  ! SVec methods
+  private :: VectorCopyS
+  private :: VectorSumS
+  private :: VectorSubtractS
+  private :: VectorScaleRS
+  private :: VectorScaleLS
+  private :: InnerProductS
+  private :: VectorDivideS
   private :: OuterProductS
-  private :: OuterProductD, OuterProductC, InitEigenSolSymD, FinEigenSolSymD, DiagSymD, EigenvalD
-  private :: InitEigenSolHermite, FinEigenSolHermite, DiagHermite!, EigenvalHermite
 
+  ! DVec methods
+  private :: VectorCopyD
+  private :: VectorSumD
+  private :: VectorSubtractD
+  private :: VectorScaleRD
+  private :: VectorScaleLD
+  private :: InnerProductD
+  private :: VectorDivideD
+  private :: OuterProductD
+
+  ! CVec methods
+  private :: VectorCopyC
+  private :: VectorSumC
+  private :: VectorSubtractC
+  private :: VectorScaleRC
+  private :: VectorScaleLC
+  private :: InnerProductC
+  private :: VectorDivideC
+  private :: OuterProductC
+
+  ! SMat methods
+  private :: MatrixCopyS
+  private :: MatrixSumS
+  private :: MatrixSubtractS
+  private :: MatrixScaleLS
+  private :: MatrixScaleRS
+  private :: MatrixProductS
+  private :: MatrixScaleDivideS
+
+  ! DMat methods
+  private :: MatrixCopyD
+  private :: MatrixSumD
+  private :: MatrixSubtractD
+  private :: MatrixScaleLD
+  private :: MatrixScaleRD
+  private :: MatrixProductD
+  private :: MatrixScaleDivideD
+
+  ! CMat methods
+  private :: MatrixCopyC
+  private :: MatrixSumC
+  private :: MatrixSubtractC
+  private :: MatrixScaleLC
+  private :: MatrixScaleRC
+  private :: MatrixProductC
+  private :: MatrixScaleDivideC
+
+  private :: DVec2SVec
+  private :: SVec2DVec
+  private :: SMat2DMat
+  private :: DMat2SMat
+
+  ! MatVec single
+  private :: MVProductS
+  private :: VMProductS
+  ! MatVec double
+  private :: MVProductD
+  private :: VMProductD
+  ! MatVec complex
+  private :: MVProductC
+  private :: VMProductC
+
+  ! diagonalization methods
+  private :: InitEigenSolSymD
+  private :: FinEigenSolSymD
+  private :: DiagSymD
+  private :: EigenvalD
+  private :: InitEigenSolHermite
+  private :: FinEigenSolHermite
+  private :: DiagHermite
+  !private :: EigenvalHermite
 
   interface assignment(=)
-    procedure :: VectorCopyD, &
-        & VectorCopyS, &
-        & VectorCopyC, &
-        & MatrixCopyS, &
-        & MatrixCopyD, &
-        & MatrixCopyC
+    procedure :: VectorCopyD
+    procedure :: VectorCopyS
+    procedure :: VectorCopyC
+    procedure :: MatrixCopyS
+    procedure :: MatrixCopyD
+    procedure :: MatrixCopyC
   end interface assignment(=)
 
   interface operator(+)
-    procedure :: VectorSumD, &
-        & VectorSumS, &
-        & VectorSumC, &
-        & MatrixSumS, &
-        & MatrixSumD, &
-        & MatrixSumC
+    procedure :: VectorSumD
+    procedure :: VectorSumS
+    procedure :: VectorSumC
+    procedure :: MatrixSumS
+    procedure :: MatrixSumD
+    procedure :: MatrixSumC
   end interface operator(+)
 
   interface operator(-)
-    procedure :: VectorSubtractD, &
-        & VectorSubtractS, &
-        & VectorSubtractC, &
-        & MatrixSubtractS, &
-        & MatrixSubtractD, &
-        & MatrixSubtractC
+    procedure :: VectorSubtractD
+    procedure :: VectorSubtractS
+    procedure :: VectorSubtractC
+    procedure :: MatrixSubtractS
+    procedure :: MatrixSubtractD
+    procedure :: MatrixSubtractC
   end interface operator(-)
 
   interface operator(*)
-    procedure :: VectorScaleRD, &
-        & VectorScaleRS, &
-        & VectorScaleRC, &
-        & VectorScaleLS, &
-        & VectorScaleLD, &
-        & VectorScaleLC, &
-        & InnerProductS, &
-        & InnerProductD, &
-        & InnerProductC, &
-        & MatrixScaleLS, &
-        & MatrixScaleLC, &
-        & MatrixScaleLD, &
-        & MatrixScaleRS, &
-        & MatrixScaleRC, &
-        & MatrixScaleRD, &
-        & MatrixProductS,&
-        & MatrixProductC,&
-        & MatrixProductD,&
-        & MVProductS   , &
-        & VMProductS   , &
-        & MVProductD   , &
-        & VMProductD   , &
-        & MVProductC   , &
-        & VMProductC
+    procedure :: VectorScaleRD
+    procedure :: VectorScaleRS
+    procedure :: VectorScaleRC
+    procedure :: VectorScaleLS
+    procedure :: VectorScaleLD
+    procedure :: VectorScaleLC
+    procedure :: InnerProductS
+    procedure :: InnerProductD
+    procedure :: InnerProductC
+    procedure :: MatrixScaleLS
+    procedure :: MatrixScaleLC
+    procedure :: MatrixScaleLD
+    procedure :: MatrixScaleRS
+    procedure :: MatrixScaleRC
+    procedure :: MatrixScaleRD
+    procedure :: MatrixProductS
+    procedure :: MatrixProductC
+    procedure :: MatrixProductD
+    procedure :: MVProductS
+    procedure :: VMProductS
+    procedure :: MVProductD
+    procedure :: VMProductD
+    procedure :: MVProductC
+    procedure :: VMProductC
   end interface operator(*)
 
   interface operator(/)
-    procedure :: VectorDivideD, &
-        & VectorDivideS, &
-        & VectorDivideC, &
-        & MatrixScaleDivideS, &
-        & MatrixScaleDivideD, &
-        & MatrixScaleDivideC
+    procedure :: VectorDivideD
+    procedure :: VectorDivideS
+    procedure :: VectorDivideC
+    procedure :: MatrixScaleDivideS
+    procedure :: MatrixScaleDivideD
+    procedure :: MatrixScaleDivideC
   end interface operator(/)
 
   interface operator(.x.)
-    procedure :: OuterProductD, &
-        & OuterProductS, &
-        & OuterProductC
+    procedure :: OuterProductD
+    procedure :: OuterProductS
+    procedure :: OuterProductC
   end interface operator(.x.)
 
   interface exp

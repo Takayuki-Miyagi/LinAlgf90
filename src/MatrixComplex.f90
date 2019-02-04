@@ -1,14 +1,29 @@
 module MatrixComplex
   use LinAlgParameters
   implicit none
-
-  private :: IniM, FinM, eye, Trans, ComplexConjugate
-  private :: HermiteConjugate, Inverse, Det, GetRandomMatrix
-  private :: MatrixPrint, DiagMat, block_cmat
-
-  public :: CMat, MatrixCopyC, MatrixProductC, MatrixSumC
-  public :: MatrixSubtractC, MatrixScaleLC, MatrixScaleRC
+  public :: CMat
+  public :: MatrixCopyC
+  public :: MatrixProductC
+  public :: MatrixSumC
+  public :: MatrixSubtractC
+  public :: MatrixScaleLC
+  public :: MatrixScaleRC
   public :: MatrixScaleDivideC
+
+  private :: IniM
+  private :: FinM
+  private :: zeros
+  private :: eye
+  private :: Trans
+  private :: ComplexConjugate
+  private :: HermiteConjugate
+  private :: Inverse
+  private :: Det
+  private :: GetRandomMatrix
+  private :: MatrixPrint
+  private :: DiagMat
+  private :: block_cmat
+
   type :: CMat
     complex(dp), allocatable :: M(:,:)
   contains

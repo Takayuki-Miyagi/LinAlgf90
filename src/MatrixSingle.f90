@@ -2,13 +2,26 @@ module MatrixSingle
   use LinAlgParameters
   implicit none
 
-  public :: SMat, MatrixCopyS, MatrixProductS, MatrixSumS
-  public :: MatrixSubtractS, MatrixScaleLS, MatrixScaleRS
+  public :: SMat
+  public :: MatrixCopyS
+  public :: MatrixProductS
+  public :: MatrixSumS
+  public :: MatrixSubtractS
+  public :: MatrixScaleLS
+  public :: MatrixScaleRS
   public :: MatrixScaleDivideS
 
-  private :: IniM, FinM, eye, Trans, Inverse, Det
-  private :: GetRandomMatrix, MatrixPrint
-  private :: DiagMat, block_SMat
+  private :: IniM
+  private :: zeros
+  private :: FinM
+  private :: eye
+  private :: Trans
+  private :: Inverse
+  private :: Det
+  private :: GetRandomMatrix
+  private :: MatrixPrint
+  private :: DiagMat
+  private :: block_SMat
 
   type :: SMat
     real(sp), allocatable :: M(:,:)
@@ -38,8 +51,7 @@ contains
     class(SMat), intent(inout) :: a
     integer(kp), intent(in) :: m,n
     if(m < 1 .or. n < 1) return
-    if(allocated(a%m)) deallocate(a%m)
-    allocate(a%m(m,n))
+    call a%ini(m,n)
     a%m = 0.0
   end subroutine zeros
 

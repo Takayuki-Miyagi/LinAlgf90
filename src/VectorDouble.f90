@@ -2,11 +2,24 @@ module VectorDouble
   use LinAlgParameters
   implicit none
 
-  private :: IniV, FinV, VectorPrint, GetRandomVector, Nrm, Nrm2
+  public :: DVec
+  public :: VectorCopyD
+  public :: VectorSumD
+  public :: VectorSubtractD
+  public :: VectorScaleRD
+  public :: VectorScaleLD
+  public :: VectorDivideD
+  public :: InnerProductD
+
+  private :: IniV
+  private :: zeros
+  private :: FinV
+  private :: VectorPrint
+  private :: GetRandomVector
+  private :: Nrm
+  private :: Nrm2
   private :: block_dvec
 
-  public :: DVec, VectorCopyD, VectorSumD, VectorSubtractD
-  public :: VectorScaleRD, VectorScaleLD, VectorDivideD, InnerProductD
 
   type :: DVec
     real(dp), allocatable :: V(:)
@@ -31,8 +44,7 @@ contains
   subroutine zeros(a, n)
     class(DVec), intent(inout) :: a
     integer(kp), intent(in) :: n
-    if(allocated(a%V)) deallocate(a%V)
-    allocate(a%V(n))
+    call a%ini(n)
     a%v(:) = 0.d0
   end subroutine zeros
 

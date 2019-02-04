@@ -2,11 +2,24 @@ module VectorComplex
   use LinAlgParameters
   implicit none
 
-  private :: iniV, FinV, ComplexConjugate, VectorPrint, GetRandomVector
-  private :: Nrm, Nrm2, block_cvec
+  public :: CVec
+  public :: VectorCopyC
+  public :: VectorSumC
+  public :: VectorSubtractC
+  public :: VectorScaleRC
+  public :: VectorScaleLC
+  public :: VectorDivideC
+  public :: InnerProductC
 
-  public :: CVec, VectorCopyC, VectorSumC, VectorSubtractC, VectorScaleRC
-  public :: VectorScaleLC, VectorDivideC, InnerProductC
+  private :: iniV
+  private :: FinV
+  private :: zeros
+  private :: ComplexConjugate
+  private :: VectorPrint
+  private :: GetRandomVector
+  private :: Nrm
+  private :: Nrm2
+  private :: block_cvec
 
   type :: CVec
     complex(dp), allocatable :: V(:)

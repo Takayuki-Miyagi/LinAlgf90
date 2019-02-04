@@ -2,11 +2,22 @@ module VectorSingle
   use LinAlgParameters
   implicit none
 
-  public :: SVec, VectorCopyS, VectorSumS, VectorSubtractS
-  public :: VectorScaleRS, VectorScaleLS, VectorDivideS, InnerProductS
+  public :: SVec
+  public :: VectorCopyS
+  public :: VectorSumS
+  public :: VectorSubtractS
+  public :: VectorScaleRS
+  public :: VectorScaleLS
+  public :: VectorDivideS
+  public :: InnerProductS
 
-
-  private :: IniV, FinV, VectorPrint, GetRandomVector, Nrm, Nrm2
+  private :: IniV
+  private :: zeros
+  private :: FinV
+  private :: VectorPrint
+  private :: GetRandomVector
+  private :: Nrm
+  private :: Nrm2
   private :: block_svec
 
   type :: SVec
@@ -32,8 +43,7 @@ contains
   subroutine zeros(a, n)
     class(SVec), intent(inout) :: a
     integer(kp), intent(in) :: n
-    if(allocated(a%V)) deallocate(a%V)
-    allocate(a%V(n))
+    call a%ini(n)
     a%v(:) = 0.0
   end subroutine zeros
 
