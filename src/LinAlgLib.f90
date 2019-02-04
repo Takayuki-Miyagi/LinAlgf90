@@ -106,76 +106,76 @@ module LinAlgLib
   !private :: EigenvalHermite
 
   interface assignment(=)
-    procedure :: VectorCopyD
-    procedure :: VectorCopyS
-    procedure :: VectorCopyC
-    procedure :: MatrixCopyS
-    procedure :: MatrixCopyD
-    procedure :: MatrixCopyC
+    module procedure :: VectorCopyD
+    module procedure :: VectorCopyS
+    module procedure :: VectorCopyC
+    module procedure :: MatrixCopyS
+    module procedure :: MatrixCopyD
+    module procedure :: MatrixCopyC
   end interface assignment(=)
 
   interface operator(+)
-    procedure :: VectorSumD
-    procedure :: VectorSumS
-    procedure :: VectorSumC
-    procedure :: MatrixSumS
-    procedure :: MatrixSumD
-    procedure :: MatrixSumC
+    module procedure :: VectorSumD
+    module procedure :: VectorSumS
+    module procedure :: VectorSumC
+    module procedure :: MatrixSumS
+    module procedure :: MatrixSumD
+    module procedure :: MatrixSumC
   end interface operator(+)
 
   interface operator(-)
-    procedure :: VectorSubtractD
-    procedure :: VectorSubtractS
-    procedure :: VectorSubtractC
-    procedure :: MatrixSubtractS
-    procedure :: MatrixSubtractD
-    procedure :: MatrixSubtractC
+    module procedure :: VectorSubtractD
+    module procedure :: VectorSubtractS
+    module procedure :: VectorSubtractC
+    module procedure :: MatrixSubtractS
+    module procedure :: MatrixSubtractD
+    module procedure :: MatrixSubtractC
   end interface operator(-)
 
   interface operator(*)
-    procedure :: VectorScaleRD
-    procedure :: VectorScaleRS
-    procedure :: VectorScaleRC
-    procedure :: VectorScaleLS
-    procedure :: VectorScaleLD
-    procedure :: VectorScaleLC
-    procedure :: InnerProductS
-    procedure :: InnerProductD
-    procedure :: InnerProductC
-    procedure :: MatrixScaleLS
-    procedure :: MatrixScaleLC
-    procedure :: MatrixScaleLD
-    procedure :: MatrixScaleRS
-    procedure :: MatrixScaleRC
-    procedure :: MatrixScaleRD
-    procedure :: MatrixProductS
-    procedure :: MatrixProductC
-    procedure :: MatrixProductD
-    procedure :: MVProductS
-    procedure :: VMProductS
-    procedure :: MVProductD
-    procedure :: VMProductD
-    procedure :: MVProductC
-    procedure :: VMProductC
+    module procedure :: VectorScaleRD
+    module procedure :: VectorScaleRS
+    module procedure :: VectorScaleRC
+    module procedure :: VectorScaleLS
+    module procedure :: VectorScaleLD
+    module procedure :: VectorScaleLC
+    module procedure :: InnerProductS
+    module procedure :: InnerProductD
+    module procedure :: InnerProductC
+    module procedure :: MatrixScaleLS
+    module procedure :: MatrixScaleLC
+    module procedure :: MatrixScaleLD
+    module procedure :: MatrixScaleRS
+    module procedure :: MatrixScaleRC
+    module procedure :: MatrixScaleRD
+    module procedure :: MatrixProductS
+    module procedure :: MatrixProductC
+    module procedure :: MatrixProductD
+    module procedure :: MVProductS
+    module procedure :: VMProductS
+    module procedure :: MVProductD
+    module procedure :: VMProductD
+    module procedure :: MVProductC
+    module procedure :: VMProductC
   end interface operator(*)
 
   interface operator(/)
-    procedure :: VectorDivideD
-    procedure :: VectorDivideS
-    procedure :: VectorDivideC
-    procedure :: MatrixScaleDivideS
-    procedure :: MatrixScaleDivideD
-    procedure :: MatrixScaleDivideC
+    module procedure :: VectorDivideD
+    module procedure :: VectorDivideS
+    module procedure :: VectorDivideC
+    module procedure :: MatrixScaleDivideS
+    module procedure :: MatrixScaleDivideD
+    module procedure :: MatrixScaleDivideC
   end interface operator(/)
 
   interface operator(.x.)
-    procedure :: OuterProductD
-    procedure :: OuterProductS
-    procedure :: OuterProductC
+    module procedure :: OuterProductD
+    module procedure :: OuterProductS
+    module procedure :: OuterProductC
   end interface operator(.x.)
 
   interface exp
-    procedure :: ExpD, ExpC
+    module procedure :: ExpD, ExpC
   end interface exp
 
   type :: EigenSolSymD
