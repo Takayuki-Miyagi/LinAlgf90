@@ -49,7 +49,7 @@ contains
     if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
     allocate(a%V(n))
-    a%V(:) = 0.d0
+    a%V(:) = (0.d0,0.d0)
   end subroutine zeros
 
   subroutine FinV(a)
@@ -77,7 +77,7 @@ contains
     n = size(a%v)
     if(n < 1) return
     call VectorCopyC(c,a)
-    call zaxpy(n, 1.d0, b%v, 1, c%v, 1)
+    call zaxpy(n, (1.d0,0.d0), b%v, 1, c%v, 1)
   end function VectorSumC
 
   type(CVec) function VectorSubtractC(a, b) result(c)
@@ -90,7 +90,7 @@ contains
     n = size(a%v)
     if(n < 1) return
     call VectorCopyC(c,a)
-    call zaxpy(n, -1.d0, b%v, 1, c%v, 1)
+    call zaxpy(n, (-1.d0,0.d0), b%v, 1, c%v, 1)
   end function VectorSubtractC
 
   type(CVec) function VectorScaleRC(a, b) result(c)
@@ -117,11 +117,13 @@ contains
   type(CVec) function VectorDivideC(a, b) result(c)
     type(CVec), intent(in) :: a
     real(dp), intent(in) :: b
+    complex(dp) :: bb
     integer(kp) :: n
     n = size(a%v)
     if(n < 1) return
     call VectorCopyC(c,a)
-    call dscal(n, 1.d0 / b, c%v, 1)
+    bb = 1.d0/b
+    call zscal(n, bb, c%v, 1)
   end function VectorDivideC
 
   type(CVec) function ComplexConjugate(a) result(b)

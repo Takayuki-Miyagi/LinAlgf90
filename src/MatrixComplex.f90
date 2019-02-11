@@ -56,7 +56,7 @@ contains
     if(m < 1 .or. n < 1) return
     if(allocated(a%m)) deallocate(a%m)
     allocate(a%m(m,n))
-    a%m = 0.d0
+    a%m = (0.d0,0.d0)
   end subroutine zeros
 
   subroutine eye(a, n)
@@ -102,7 +102,7 @@ contains
     n = size(b%m, 2)
     if(m < 1 .or. n < 1) return
     call c%Ini(m,n)
-    call zgemm('n','n',m,n,k,1.d0,a%m,m,b%m,k,0.d0,c%m,m)
+    call zgemm('n','n',m,n,k,(1.d0,0.d0),a%m,m,b%m,k,(0.d0,0.d0),c%m,m)
   end function MatrixProductC
 
   type(CMat) function MatrixSumC(a, b) result(c)
@@ -117,7 +117,7 @@ contains
     if(m < 1 .or. n < 1) return
     call MatrixCopyC(c, a)
     do i = 1, n
-      call zaxpy(m, 1.d0, b%m(:,i), 1, c%m(:,i), 1)
+      call zaxpy(m, (1.d0,0.d0), b%m(:,i), 1, c%m(:,i), 1)
     end do
   end function MatrixSumC
 
@@ -133,7 +133,7 @@ contains
     if(m < 1 .or. n < 1) return
     call MatrixCopyC(c, a)
     do i = 1, n
-      call zaxpy(m, -1.d0, b%m(:,i), 1, c%m(:,i), 1)
+      call zaxpy(m, (-1.d0,0.d0), b%m(:,i), 1, c%m(:,i), 1)
     end do
   end function MatrixSubtractC
 
@@ -165,14 +165,16 @@ contains
 
   type(CMat) function MatrixScaleDivideC(b, a) result(c)
     type(CMat), intent(in) :: b
-    real(8), intent(in) :: a
+    real(dp), intent(in) :: a
+    complex(dp) :: aa
     integer(kp) :: m, n, i
     m = size(b%m, 1)
     n = size(b%m, 2)
     if(m < 1 .or. n < 1) return
     call MatrixCopyC(c, b)
+    aa = 1.d0 / a
     do i = 1, n
-      call dscal(m, 1.d0 / a, c%m(:,i), 1)
+      call zscal(m, aa, c%m(:,i), 1)
     end do
   end function MatrixScaleDivideC
 

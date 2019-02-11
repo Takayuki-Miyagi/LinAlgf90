@@ -3,7 +3,7 @@ program test
   use LinAlgLib
 
   type(CMat) :: a, b, c, d
-  integer :: n = 2
+  integer :: n = 10
 
   call a%Random(n,n)
   call b%Random(n,n)
@@ -18,7 +18,6 @@ program test
 
   c = a * a%inv()
   call c%prt(iunit=6,msg='a * a^-1')
-  write(*,*) c%m
 
   c = b * a%inv()
   call c%prt(iunit=6,msg='b * a^-1')
@@ -30,6 +29,6 @@ program test
   call c%prt(iunit=6,msg='1st row vector')
 
   d = a%blk(1,1,1,n) * a%blk(1,n,1,1)
-  call d%prt(iunit=15,msg='')
+  call d%prt(iunit=6,msg='')
 
 end program test
