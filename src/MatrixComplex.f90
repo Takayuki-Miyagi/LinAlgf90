@@ -146,10 +146,9 @@ contains
     if(m < 1 .or. n < 1) return
     call MatrixCopyC(c, b)
     do i = 1, n
-      call dscal(m, a, c%m(:,i), 1)
+      call zscal(m, a, c%m(:,i), 1)
     end do
   end function MatrixScaleLC
-
 
   type(CMat) function MatrixScaleRC(a, b) result(c)
     type(CMat), intent(in) :: b
@@ -160,7 +159,7 @@ contains
     if(m < 1 .or. n < 1) return
     call MatrixCopyC(c, b)
     do i = 1, n
-      call dscal(m, a, c%m(:,i), 1)
+      call zscal(m, a, c%m(:,i), 1)
     end do
   end function MatrixScaleRC
 

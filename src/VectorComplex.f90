@@ -90,7 +90,7 @@ contains
     n = size(a%v)
     if(n < 1) return
     call VectorCopyC(c,a)
-    call daxpy(n, -1.d0, b%v, 1, c%v, 1)
+    call zaxpy(n, -1.d0, b%v, 1, c%v, 1)
   end function VectorSubtractC
 
   type(CVec) function VectorScaleRC(a, b) result(c)
@@ -111,7 +111,7 @@ contains
     n = size(a%v)
     if(n < 1) return
     call VectorCopyC(c,a)
-    call dscal(n, b, c%v, 1)
+    call zscal(n, b, c%v, 1)
   end function VectorScaleLC
 
   type(CVec) function VectorDivideC(a, b) result(c)
@@ -121,7 +121,7 @@ contains
     n = size(a%v)
     if(n < 1) return
     call VectorCopyC(c,a)
-    call zdscal(n, 1.d0 / b, c%v, 1)
+    call dscal(n, 1.d0 / b, c%v, 1)
   end function VectorDivideC
 
   type(CVec) function ComplexConjugate(a) result(b)

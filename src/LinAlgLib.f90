@@ -1,6 +1,6 @@
 module LinAlgLib
   use LinAlgParameters
-  use SingleDouble
+  use SingleDoubleComplex
   use VectorSingle
   use VectorDouble
   use VectorComplex
@@ -112,6 +112,20 @@ module LinAlgLib
     module procedure :: MatrixCopyS
     module procedure :: MatrixCopyD
     module procedure :: MatrixCopyC
+    ! single <-> double <-> complex vector
+    module procedure :: DVec2SVec
+    module procedure :: SVec2DVec
+    module procedure :: SVec2CVec
+    module procedure :: DVec2CVec
+    module procedure :: CVec2DVecReal
+    module procedure :: CVec2SVecReal
+    ! single <-> double <-> complex matrix
+    module procedure :: SMat2DMat
+    module procedure :: DMat2SMat
+    module procedure :: SMat2CMat
+    module procedure :: DMat2CMat
+    module procedure :: CMat2DMatReal
+    module procedure :: CMat2SMatReal
   end interface assignment(=)
 
   interface operator(+)
