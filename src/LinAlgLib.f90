@@ -202,6 +202,16 @@ module LinAlgLib
     procedure :: Eigenval => EigenvalD ! only eigen values
   end type EigenSolSymD
 
+  type :: GenEigenSolSymD
+    type(DVec) :: eig
+    type(DMat) :: vec
+    integer :: itype = 1
+  contains
+    procedure :: init => InitGenEigenSolSymD
+    procedure :: fin => FinGenEigenSolSymD
+    procedure :: DiagSym => DiagGenSymD   ! eigen values and eigen vectors
+  end type GenEigenSolSymD
+
   type :: EigenSolHermite
     type(DVec) :: eig
     type(CMat) :: vec
@@ -341,6 +351,45 @@ contains
     deallocate(work)
     deallocate(d, e, tau,iblock, isplit)
   end subroutine EigenvalD
+
+  subroutine InitGenEigenSolSymD(this, A, B, itype)
+    class(GenEigenSolSymD) :: this
+    type(DMat), intent(in) :: A, B
+    integer(kp), intent(in), optional :: itype
+    integer(kp) :: n
+    if(present(itype)) this%itype = itype
+    n = size(A%m, 1)
+    if(this%itype == 2) n = size(A%m, 1)
+    if(this%itype == 3) n = size(B%m, 1)
+    call this%eig%ini(n)
+    call this%vec%ini(n,n)
+  end subroutine InitGenEigenSolSymD
+
+  subroutine FinGenEigenSolSymD(this)
+    class(GenEigenSolSymD) :: this
+    call this%eig%fin()
+    call this%vec%fin()
+  end subroutine FinGenEigenSolSymD
+
+  subroutine DiagGenSymD(this, A, B)
+    class(GenEigenSolSymD) :: this
+    type(DMat), intent(in) :: A, B
+    integer(kp) :: n, lda, ldb, lwork, liwork, info, idummy, i
+    real(dp) :: dummy
+    integer(kp), allocatable :: iwork(:)
+    real(dp), allocatable :: work(:)
+    this%vec = A
+    n = size(A%M, 1)
+    lda = size(A%m,1)
+    ldb = size(B%m,1)
+    call dsygvd(this%itype, 'V', 'U', n, A%m, lda, B%m, ldb, this%eig%v, dummy, -1, idummy, -1, info)
+    lwork = int(dummy)
+    liwork = idummy
+    allocate(work(lwork), iwork(liwork))
+    call dsygvd(this%itype, 'V', 'U', n, A%m, lda, B%m, ldb, this%eig%v, work, lwork, iwork, liwork, info)
+    deallocate(work, iwork)
+    this%vec = A
+  end subroutine DiagGenSymD
 
   subroutine InitEigenSolHermite(this, A)
     class(EigenSolHermite) :: this
