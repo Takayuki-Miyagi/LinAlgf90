@@ -27,10 +27,11 @@ MAINDIR = test
 #SRCMAIN += $(MAINDIR)/test_CVec.f90
 #SRCMAIN += $(MAINDIR)/test_SMat.f90
 #SRCMAIN += $(MAINDIR)/test_DMat.f90
-SRCMAIN += $(MAINDIR)/test_CMat.f90
+#SRCMAIN += $(MAINDIR)/test_CMat.f90
 #SRCMAIN += $(MAINDIR)/init_time.f90
 #SRCMAIN += $(MAINDIR)/test_type_conv.f90
 #SRCMAIN += $(MAINDIR)/test_EigenSolSymD.f90
+SRCMAIN += $(MAINDIR)/test_GenEigenSolSymD.f90
 #SRCMAIN += $(MAINDIR)/test_EigenSolHermite.f90
 
 
