@@ -297,9 +297,10 @@ contains
     integer(kp) :: n, i
     n = size(a%V)
     if(n < 1) return
-    call b%Ini(n,n)
+    call b%zeros(n,n)
     do i = 1, n
       b%M(i,i) = a%V(i)
     end do
   end subroutine DiagMat
+
 end module MatrixSingle

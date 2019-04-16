@@ -205,4 +205,5 @@ contains
     call r%ini(n)
     r%v(:) = this%v(n1:n2)
   end function block_SVec
+
 end module VectorSingle
