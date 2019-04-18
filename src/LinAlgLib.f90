@@ -514,19 +514,31 @@ contains
   !  deallocate(d, e, tau,iblock, isplit)
   !end subroutine EigenvalHermite
 
-  type(DMat) function ExpD(a, ord) result(r)
+  type(DMat) function ExpD(a, ord, tol_in, show_process) result(r)
     type(DMat), intent(in) :: a
     type(DMat) :: b
     integer(kp), intent(in), optional :: ord
+    real(dp), intent(in), optional :: tol_in
+    logical, intent(in), optional :: show_process
+    real(dp) :: tol = 1.d-8
+    logical :: show = .false.
     integer(kp) :: i
     integer(kp) :: iord = 12
     if(present(ord)) iord = ord
+    if(present(tol_in)) tol = tol_in
+    if(present(show_process)) show = show_process
     call r%eye(size(a%m, 1))
     b = r
     do i = 1, iord
-      b = b * a / dble(i)
+      b = (b * a) / dble(i)
       r = r + b
+      if(show) then
+        write(*,"(a,i4,a,es18.8)") "max value of matrix: order=",i,&
+            & " maxval(A)",maxval(b%m)
+      end if
+      if((maxval(b%m)) < tol) return
     end do
+    write(*,"(a,i4)") "warning: increase ord, current value is ", iord
   end function ExpD
 
   type(CMat) function ExpC(a, ord) result(r)
