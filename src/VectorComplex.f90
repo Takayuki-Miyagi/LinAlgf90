@@ -48,8 +48,8 @@ contains
   subroutine zeros(a, n)
     class(CVec), intent(inout) :: a
     integer(kp), intent(in) :: n
-    if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
+    if(n < 1) return
     a%n_size = n
     allocate(a%V(a%n_size))
     a%V(:) = (0.d0,0.d0)

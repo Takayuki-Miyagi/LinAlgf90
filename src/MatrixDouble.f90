@@ -44,8 +44,8 @@ contains
   subroutine iniM(a, m, n)
     class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: m,n
+    if(allocated(a%m)) call a%fin()
     if(m < 1 .or. n < 1) return
-    if(allocated(a%m)) deallocate(a%m)
     a%n_row=m
     a%n_col=n
     allocate(a%m(a%n_row,a%n_col))
@@ -54,8 +54,8 @@ contains
   subroutine zeros(a, m, n)
     class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: m,n
+    if(allocated(a%m)) call a%fin()
     if(m < 1 .or. n < 1) return
-    if(allocated(a%m)) deallocate(a%m)
     a%n_row=m
     a%n_col=n
     allocate(a%m(a%n_row,a%n_col))
@@ -66,8 +66,8 @@ contains
     class(DMat), intent(inout) :: a
     integer(kp), intent(in) :: n
     integer(kp) :: i
+    if(allocated(a%m)) call a%fin()
     if(n < 1) return
-    if(allocated(a%m)) deallocate(a%m)
     a%n_row=n
     a%n_col=n
     allocate(a%m(a%n_row,a%n_col))
