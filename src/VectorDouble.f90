@@ -23,6 +23,7 @@ module VectorDouble
 
   type :: DVec
     real(dp), allocatable :: V(:)
+    integer :: n_size=0
   contains
     procedure :: Ini => iniV
     procedure :: zeros
@@ -38,7 +39,8 @@ contains
     class(DVec), intent(inout) :: a
     integer(kp), intent(in) :: n
     if(allocated(a%V)) deallocate(a%V)
-    allocate(a%V(n))
+    a%n_size = n
+    allocate(a%V(a%n_size))
   end subroutine IniV
 
   subroutine zeros(a, n)
@@ -51,13 +53,14 @@ contains
   subroutine FinV(a)
     class(DVec), intent(inout) :: a
     if(allocated(a%V)) deallocate(a%V)
+    a%n_size = 0
   end subroutine FinV
 
   subroutine VectorCopyD(b, a)
     type(DVec), intent(inout) :: b
     type(DVec), intent(in) :: a
     integer(kp) :: n
-    n = size(a%V)
+    n = a%n_size
     if(n < 1) return
     call b%Ini(n)
     call dcopy(n, a%v, 1, b%v, 1)
@@ -66,11 +69,11 @@ contains
   type(DVec) function VectorSumD(a, b) result(c)
     type(DVec), intent(in) :: a, b
     integer(kp) :: n
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in DVectorSum'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyD(c, a)
     call daxpy(n, 1.d0, b%v, 1, c%v, 1)
@@ -79,11 +82,11 @@ contains
   type(DVec) function VectorSubtractD(a, b) result(c)
     type(DVec), intent(in) :: a, b
     integer(kp) :: n
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in DVectorSubtract'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyD(c, a)
     call daxpy(n, -1.d0, b%v, 1, c%v, 1)
@@ -93,7 +96,7 @@ contains
     type(DVec), intent(in) :: a
     real(dp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyD(c, a)
     call dscal(n, b, c%v, 1)
@@ -103,7 +106,7 @@ contains
     type(DVec), intent(in) :: a
     real(dp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyD(c, a)
     call dscal(n, b, c%v, 1)
@@ -113,7 +116,7 @@ contains
     type(DVec), intent(in) :: a
     real(dp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyD(c, a)
     call dscal(n, 1.d0 / b, c%v, 1)
@@ -123,11 +126,11 @@ contains
     type(DVec), intent(in) :: a, b
     integer(kp) :: n
     real(dp) :: ddot
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in InnerProduct'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     c = 0.d0
     if(n < 1) return
     c = ddot(n, a%v, 1, b%v, 1)
@@ -138,7 +141,7 @@ contains
     integer(kp) :: n
     real(dp) :: dnrm2
     b = 0.d0
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     b = dnrm2(n, a%v, 1)
   end function Nrm
@@ -148,7 +151,7 @@ contains
     integer(kp) :: n
     real(dp) :: ddot
     b = 0.d0
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     b = ddot(n, a%v, 1, a%v, 1)
   end function Nrm2

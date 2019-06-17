@@ -22,6 +22,7 @@ module VectorSingle
 
   type :: SVec
     real(sp), allocatable :: V(:)
+    integer :: n_size = 0
   contains
     procedure :: Ini => iniV
     procedure :: zeros
@@ -37,7 +38,8 @@ contains
     class(SVec), intent(inout) :: a
     integer(kp), intent(in) :: n
     if(allocated(a%V)) deallocate(a%V)
-    allocate(a%V(n))
+    a%n_size = n
+    allocate(a%V(a%n_size))
   end subroutine IniV
 
   subroutine zeros(a, n)
@@ -50,13 +52,14 @@ contains
   subroutine FinV(a)
     class(SVec), intent(inout) :: a
     if(allocated(a%V)) deallocate(a%V)
+    a%n_size = 0
   end subroutine FinV
 
   subroutine VectorCopyS(b, a)
     type(SVec), intent(inout) :: b
     type(SVec), intent(in) :: a
     integer(kp) :: n
-    n = size(a%V)
+    n = a%n_size
     if(n < 1) return
     call b%Ini(n)
     call scopy(n, a%v, 1, b%v, 1)
@@ -65,11 +68,11 @@ contains
   type(SVec) function VectorSumS(a, b) result(c)
     type(SVec), intent(in) :: a, b
     integer(kp) :: n
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in DVectorSum'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyS(c, a)
     call saxpy(n, 1.0, b%v, 1, c%v, 1)
@@ -78,11 +81,11 @@ contains
   type(SVec) function VectorSubtractS(a, b) result(c)
     type(SVec), intent(in) :: a, b
     integer(kp) :: n
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in SVectorSubtract'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyS(c, a)
     call saxpy(n, -1.0, b%v, 1, c%v, 1)
@@ -92,7 +95,7 @@ contains
     type(SVec), intent(in) :: a
     real(sp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyS(c, a)
     call sscal(n, b, c%v, 1)
@@ -102,7 +105,7 @@ contains
     type(SVec), intent(in) :: a
     real(sp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyS(c, a)
     call sscal(n, b, c%v, 1)
@@ -112,7 +115,7 @@ contains
     type(SVec), intent(in) :: a
     real(sp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyS(c, a)
     call sscal(n, 1.0 / b, c%v, 1)
@@ -122,12 +125,12 @@ contains
     type(SVec), intent(in) :: a, b
     integer(kp) :: n
     real(sp) :: sdot
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in InnerProduct'
       stop
     end if
     c = 0.0
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     c = sdot(n, a%v, 1, b%v, 1)
   end function InnerProductS
@@ -137,7 +140,7 @@ contains
     integer(kp) :: n
     real(sp) :: snrm2
     b = 0.0
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     b = snrm2(n, a%v, 1)
   end function Nrm
@@ -147,7 +150,7 @@ contains
     integer(kp) :: n
     real(sp) :: sdot
     b = 0.0
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     b = sdot(n, a%v, 1, a%v, 1)
   end function Nrm2

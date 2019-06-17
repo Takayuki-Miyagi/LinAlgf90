@@ -23,6 +23,7 @@ module VectorComplex
 
   type :: CVec
     complex(dp), allocatable :: V(:)
+    integer :: n_size = 0
   contains
     procedure :: Ini => iniV
     procedure :: zeros
@@ -40,7 +41,8 @@ contains
     integer(kp), intent(in) :: n
     if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
-    allocate(a%V(n))
+    a%n_size = n
+    allocate(a%V(a%n_size))
   end subroutine IniV
 
   subroutine zeros(a, n)
@@ -48,20 +50,22 @@ contains
     integer(kp), intent(in) :: n
     if(n < 1) return
     if(allocated(a%V)) deallocate(a%V)
-    allocate(a%V(n))
+    a%n_size = n
+    allocate(a%V(a%n_size))
     a%V(:) = (0.d0,0.d0)
   end subroutine zeros
 
   subroutine FinV(a)
     class(CVec), intent(inout) :: a
     if(allocated(a%V)) deallocate(a%V)
+    a%n_size = 0
   end subroutine FinV
 
   subroutine VectorCopyC(b, a)
     type(CVec), intent(inout) :: b
     type(CVec), intent(in) :: a
     integer(kp) :: n
-    n = size(a%V)
+    n = a%n_size
     if(n < 1) return
     call b%Ini(n)
     call zcopy(n, a%v, 1, b%v, 1)
@@ -70,11 +74,11 @@ contains
   type(CVec) function VectorSumC(a, b) result(c)
     type(CVec), intent(in) :: a, b
     integer(kp) :: n
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in DVectorSum'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyC(c,a)
     call zaxpy(n, (1.d0,0.d0), b%v, 1, c%v, 1)
@@ -83,11 +87,11 @@ contains
   type(CVec) function VectorSubtractC(a, b) result(c)
     type(CVec), intent(in) :: a, b
     integer(kp) :: n
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in DVectorSubtract'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyC(c,a)
     call zaxpy(n, (-1.d0,0.d0), b%v, 1, c%v, 1)
@@ -97,7 +101,7 @@ contains
     type(CVec), intent(in) :: a
     complex(dp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyC(c,a)
     call zscal(n, b, c%v, 1)
@@ -108,7 +112,7 @@ contains
     type(CVec), intent(in) :: a
     complex(dp), intent(in) :: b
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyC(c,a)
     call zscal(n, b, c%v, 1)
@@ -119,7 +123,7 @@ contains
     real(dp), intent(in) :: b
     complex(dp) :: bb
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call VectorCopyC(c,a)
     bb = 1.d0/b
@@ -129,7 +133,7 @@ contains
   type(CVec) function ComplexConjugate(a) result(b)
     class(CVec), intent(in) :: a
     integer(kp) :: n
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     call b%ini(n)
     b%v = conjg(a%v)
@@ -140,11 +144,11 @@ contains
     integer(kp) :: n
     real(dp) :: zdotu
     c = 0.d0
-    if(size(a%v) /= size(b%v)) then
+    if(a%n_size /= b%n_size) then
       write(*,'(a)') 'Error in InnerProduct'
       stop
     end if
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     c = zdotu(n, a%v, 1, b%v, 1)
   end function InnerProductC
@@ -154,7 +158,7 @@ contains
     integer(kp) :: n
     real(dp) :: dznrm2
     b = 0.d0
-    n = size(a%v)
+    n = a%n_size
     if(n < 1) return
     b = dznrm2(n, a%v, 1)
   end function Nrm
@@ -163,7 +167,7 @@ contains
     class(CVec), intent(in) :: a
     integer(kp) :: n
     real(dp) :: dznrm2
-    n = size(a%v)
+    n = a%n_size
     b = 0.d0
     if(n < 1) return
     b = dznrm2(n, a%v, 1) ** 2

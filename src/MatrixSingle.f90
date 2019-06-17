@@ -25,6 +25,8 @@ module MatrixSingle
 
   type :: SMat
     real(sp), allocatable :: M(:,:)
+    integer :: n_row=0
+    integer :: n_col=0
   contains
     procedure :: Ini => IniM
     procedure :: Fin => FinM
@@ -44,7 +46,9 @@ contains
     integer(kp), intent(in) :: m,n
     if(m < 1 .or. n < 1) return
     if(allocated(a%m)) deallocate(a%m)
-    allocate(a%m(m,n))
+    a%n_row = m
+    a%n_col = n
+    allocate(a%m(a%n_row,a%n_col))
   end subroutine iniM
 
   subroutine zeros(a, m, n)
@@ -61,8 +65,10 @@ contains
     integer(kp) :: i
     if(n < 1) return
     if(allocated(a%m)) deallocate(a%m)
-    allocate(a%m(n,n))
-    a%m = 0.0
+    a%n_row = n
+    a%n_col = n
+    allocate(a%m(a%n_row,a%n_col))
+    a%m(:,:) = 0.d0
     do i = 1, n
       a%m(i,i) = 1.0
     end do
@@ -71,14 +77,16 @@ contains
   subroutine FinM(a)
     class(SMat), intent(inout) :: a
     if(allocated(a%m)) deallocate(a%m)
+    a%n_row = 0
+    a%n_col = 0
   end subroutine FinM
 
   subroutine MatrixCopyS(b, a)
     type(SMat), intent(inout) :: b
     type(SMat), intent(in) :: a
     integer(kp) :: m, n, i
-    m = size(a%m, 1)
-    n = size(a%m, 2)
+    m = a%n_row
+    n = a%n_col
     if(m < 1 .or. n < 1) return
     call b%Ini(m,n)
     do i = 1, n
@@ -89,13 +97,13 @@ contains
   type(SMat) function MatrixProductS(a, b) result(c)
     type(SMat), intent(in) :: a, b
     integer(kp) :: m, k, n
-    m = size(a%m, 1)
-    k = size(a%m, 2)
-    if(size(a%m, 2) /= size(b%m, 1)) then
+    m = a%n_row
+    k = a%n_col
+    if(a%n_col /= b%n_row) then
       write(*, '(a)') 'Error in MatrixProduct'
       stop
     end if
-    n = size(b%m, 2)
+    n = b%n_col
     if(m < 1 .or. n < 1) return
     call c%Ini(m,n)
     call sgemm('n','n',m,n,k,1.0,a%m,m,b%m,k,0.0,c%m,m)
@@ -104,12 +112,12 @@ contains
   type(SMat) function MatrixSumS(a, b) result(c)
     type(SMat), intent(in) :: a, b
     integer(kp) :: m, n, i
-    if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
-      write(*, '(a)') 'Error in MatrixSum'
+    if(a%n_row /= b%n_row .or. a%n_col /= b%n_col) then
+      write(*, '(a)') 'Error in MatrixSumS'
       stop
     end if
-    m = size(a%m, 1)
-    n = size(a%m, 2)
+    m = a%n_row
+    n = a%n_col
     if(m < 1 .or. n < 1) return
     call MatrixCopyS(c, a)
     do i = 1, n
@@ -120,12 +128,12 @@ contains
   type(SMat) function MatrixSubtractS(a, b) result(c)
     type(SMat), intent(in) :: a, b
     integer(kp) :: m, n, i
-    if(size(a%m, 1) /= size(b%m, 1) .or. size(a%m, 2) /= size(b%m, 2)) then
-      write(*, '(a)') 'Error in MatrixSum'
+    if(a%n_row /= b%n_row .or. a%n_col /= b%n_col) then
+      write(*, '(a)') 'Error in MatrixSubtractS'
       stop
     end if
-    m = size(a%m, 1)
-    n = size(a%m, 2)
+    m = a%n_row
+    n = a%n_col
     if(m < 1 .or. n < 1) return
     call MatrixCopyS(c, a)
     do i = 1, n
@@ -137,8 +145,8 @@ contains
     type(SMat), intent(in) :: b
     real(sp), intent(in) :: a
     integer(kp) :: m, n, i
-    m = size(b%m, 1)
-    n = size(b%m, 2)
+    m = b%n_row
+    n = b%n_col
     if(m < 1 .or. n < 1) return
     call MatrixCopyS(c, b)
     do i = 1, n
@@ -150,8 +158,8 @@ contains
     type(SMat), intent(in) :: b
     real(sp), intent(in) :: a
     integer(kp) :: m, n, i
-    m = size(b%m, 1)
-    n = size(b%m, 2)
+    m = b%n_row
+    n = b%n_col
     if(m < 1 .or. n < 1) return
     call MatrixCopyS(c, b)
     do i = 1, n
@@ -163,8 +171,8 @@ contains
     type(SMat), intent(in) :: b
     real(sp), intent(in) :: a
     integer(kp) :: m, n, i
-    m = size(b%m, 1)
-    n = size(b%m, 2)
+    m = b%n_row
+    n = b%n_col
     if(m < 1 .or. n < 1) return
     call MatrixCopyS(c, b)
     do i = 1, n
@@ -175,8 +183,8 @@ contains
   type(SMat) function Trans(a) result(b)
     class(SMat), intent(in) :: a
     integer(kp) :: n, m
-    m = size(a%m, 1)
-    n = size(a%m, 2)
+    m = a%n_row
+    n = a%n_col
     if(m < 1 .or. n < 1) return
     call b%Ini(n,m)
     b%M = transpose(a%M)
@@ -188,7 +196,7 @@ contains
     real(sp), allocatable :: work(:)
     integer(kp), allocatable :: ipvt(:)
     integer(kp) :: info, n
-    n = size(r%m, 1)
+    n = r%n_row
     if(n < 1) return
     call s%Ini(n,n)
     allocate(work(n*n),ipvt(n))
@@ -205,7 +213,7 @@ contains
     integer(kp) :: n, i, info
     real(sp), allocatable :: a(:,:)
     integer(kp), allocatable :: ipiv(:)
-    n = size(r%m, 1)
+    n = r%n_row
     d = 0.0
     if(n < 1) return
     allocate(ipiv(n), a(n,n))
@@ -235,6 +243,9 @@ contains
     character(12) :: cfmt
     integer(kp) :: i, j, n, m
     integer :: unt
+
+    if(this%n_row<1 .or. this%n_col<1) return
+
     if(present(iunit)) then; unt = iunit
     else; unt = 6; end if
 
@@ -245,8 +256,8 @@ contains
       write(unt) this%m
     else
       if(present(msg)) write(unt,*) msg
-      n = size(this%m, 1)
-      m = size(this%m, 2)
+      n = this%n_row
+      m = this%n_col
       if(unt == 6) then
         cfmt = '( xf10.4)'
         write(cfmt(2:3), '(I2)') m
@@ -295,7 +306,7 @@ contains
     class(SMat), intent(inout) :: b
     type(SVec), intent(in) :: a
     integer(kp) :: n, i
-    n = size(a%V)
+    n = a%n_size
     if(n < 1) return
     call b%zeros(n,n)
     do i = 1, n
