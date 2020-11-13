@@ -247,7 +247,7 @@ contains
     real(dp), allocatable :: work(:), rcondz(:), zerrbd(:), mat(:,:)
     integer(kp), allocatable :: iwork(:), ifailv(:)
     integer(kp) :: info, lwork, n, i, num
-    real(dp) :: lw, dlamch, e, eerbd
+    real(dp) :: dlamch, e, eerbd
     n = size(A%M, 1)
     this%vec = A
 
@@ -256,8 +256,12 @@ contains
       ! solve all eigen values and eigen vectors
       !
 
-      call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, lw, -1, info)
-      lwork = int(lw)
+      !call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, lw, -1, info)
+      !lwork = int(lw)
+      allocate(work(1))
+      call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, work, -1, info)
+      lwork = int(work(1))
+      deallocate(work)
       allocate(work(lwork))
       call dsyev('v', 'u', n, this%vec%m, n, this%eig%v, work, lwork, info)
       if(info /= 0) then
@@ -291,9 +295,14 @@ contains
       allocate(mat(n,n))
       allocate(iwork(5*n), ifailv(n))
       mat = A%m
+      !call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
+      !    &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+      !lwork = int(lw)
+      allocate(work(1))
       call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
-          &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
-      lwork = int(lw)
+          &  num, this%eig%v, this%vec%m, n, work, -1, iwork, ifailv, info)
+      lwork = int(work(1))
+      deallocate(work)
       allocate(work(1:lwork))
       call dsyevx('v', 'i', 'u', n, mat, n, -1.d100, 1.d100, 1, m, dlamch('S'), &
           &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
@@ -313,9 +322,14 @@ contains
       allocate(iwork(5*n), ifailv(n))
       mat = A%m
       this%eig%v(:) = 0.d0
+      !call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
+      !    &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
+      !lwork = int(lw)
+      allocate(work(1))
       call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
-          &  num, this%eig%v, this%vec%m, n, lw, -1, iwork, ifailv, info)
-      lwork = int(lw)
+          &  num, this%eig%v, this%vec%m, n, work, -1, iwork, ifailv, info)
+      lwork = int(work(1))
+      deallocate(work)
       allocate(work(1:lwork))
       call dsyevx('v', 'v', 'u', n, mat, n, qmin, qmax, 1, n, dlamch('S'), &
           &  num, this%eig%v, this%vec%m, n, work, lwork, iwork, ifailv, info)
@@ -333,14 +347,18 @@ contains
     integer(kp), intent(in) :: m
     integer(kp), allocatable :: iwork(:), iblock(:), isplit(:)
     real(dp), allocatable :: work(:), d(:), e(:), tau(:), w(:)
-    real(dp) :: dlamch, lw
+    real(dp) :: dlamch
     integer(kp) :: n, info, lwork, nsplit, i
 
     n = size(A%M, 1)
     allocate(d(n), e(max(1, n-1)), tau(max(1, n-1)), w(n))
     allocate(iblock(n), isplit(n))
-    call dsytrd('u',n,A%m,n,d,e,tau,lw,-1,info)
-    lwork = int(lw)
+    !call dsytrd('u',n,A%m,n,d,e,tau,lw,-1,info)
+    !lwork = int(lw)
+    allocate(work(1))
+    call dsytrd('u',n,A%m,n,d,e,tau,work,-1,info)
+    lwork = int(work(1))
+    deallocate(work)
     allocate(work(lwork))
     call dsytrd('u',n,A%m,n,d,e,tau,work,lwork,info)
     call dstebz('i','e',n,0.d0,0.d0,1,min(n,m),dlamch('S'), &
@@ -374,17 +392,20 @@ contains
   subroutine DiagGenSymD(this, A, B)
     class(GenEigenSolSymD) :: this
     type(DMat), intent(in) :: A, B
-    integer(kp) :: n, lda, ldb, lwork, liwork, info, idummy, i
-    real(dp) :: dummy
+    integer(kp) :: n, lda, ldb, lwork, liwork, info
     integer(kp), allocatable :: iwork(:)
     real(dp), allocatable :: work(:)
     this%vec = A
     n = size(A%M, 1)
     lda = size(A%m,1)
     ldb = size(B%m,1)
-    call dsygvd(this%itype, 'V', 'U', n, A%m, lda, B%m, ldb, this%eig%v, dummy, -1, idummy, -1, info)
-    lwork = int(dummy)
-    liwork = idummy
+    !call dsygvd(this%itype, 'V', 'U', n, A%m, lda, B%m, ldb, this%eig%v, dummy, -1, idummy, -1, info)
+    !lwork = int(dummy)
+    allocate(work(1), iwork(1))
+    call dsygvd(this%itype, 'V', 'U', n, A%m, lda, B%m, ldb, this%eig%v, work, -1, iwork, -1, info)
+    lwork = int(work(1))
+    liwork = iwork(1)
+    deallocate(work,iwork)
     allocate(work(lwork), iwork(liwork))
     call dsygvd(this%itype, 'V', 'U', n, A%m, lda, B%m, ldb, this%eig%v, work, lwork, iwork, liwork, info)
     deallocate(work, iwork)
@@ -416,7 +437,6 @@ contains
     complex(dp), allocatable :: work(:)
     real(dp), allocatable :: rwork(:)
     integer(kp) :: info, lwork, n
-    real(dp) :: lw
     n = size(A%M, 1)
     this%vec = A
 
@@ -427,8 +447,12 @@ contains
       !
 
       allocate(rwork(3*n - 2))
-      call zheev('v', 'u', n, this%vec%m, n, this%eig%v, lw, -1, rwork, info)
-      lwork = int(lw)
+      !call zheev('v', 'u', n, this%vec%m, n, this%eig%v, lw, -1, rwork, info)
+      !lwork = int(lw)
+      allocate(work(1))
+      call zheev('v', 'u', n, this%vec%m, n, this%eig%v, work, -1, rwork, info)
+      lwork = int(work(1))
+      deallocate(work)
       allocate(work(lwork))
       call zheev('v', 'u', n, this%vec%m, n, this%eig%v, work, lwork, rwork, info)
       if(info /= 0) then
