@@ -21,6 +21,7 @@ module LinAlgLib
   public :: operator(.x.)
   public :: EigenSolSymD
   public :: EigenSolHermite
+  public :: DSingularValueDecomposition
   public :: exp
 
   ! SVec methods
@@ -221,6 +222,15 @@ module LinAlgLib
     procedure :: DiagSym => DiagHermite      ! eigen values and eigen vectors
     !procedure :: Eigenval => EigenvalHermite ! only eigen values
   end type EigenSolHermite
+
+  type :: DSingularValueDecomposition
+    type(DMat) :: U, V
+    type(DVec) :: Sigma
+  contains
+    procedure :: init => InitDSVD
+    procedure :: fin => FinDSVD
+    procedure :: SVD => DSVD
+  end type DSingularValueDecomposition
 contains
 
   subroutine InitEigenSolSymD(this, A)
@@ -579,4 +589,41 @@ contains
       r = r + b
     end do
   end function ExpC
+
+  subroutine InitDSVD(this, A)
+    class(DSingularValueDecomposition) :: this
+    type(DMat), intent(in) :: A
+    integer(kp) :: n
+    call this%U%ini(A%n_row, min(A%n_row, A%n_col))
+    call this%Sigma%ini(min(A%n_row, A%n_col))
+    call this%V%ini(min(A%n_row, A%n_col), A%n_col)
+  end subroutine InitDSVD
+
+  subroutine FinDSVD(this)
+    class(DSingularValueDecomposition) :: this
+    call this%U%fin()
+    call this%Sigma%fin()
+    call this%V%fin()
+  end subroutine FinDSVD
+
+  subroutine DSVD(this, A)
+    class(DSingularValueDecomposition) :: this
+    type(DMat), intent(in) :: A
+    real(dp), allocatable :: work(:)
+    integer(kp) :: m, n, lwork, info
+    type(DMat) :: Atmp
+    Atmp = A
+    m = Atmp%n_row
+    n = Atmp%n_col
+
+    ! Full decomposition
+    allocate(work(1))
+    lwork = -1
+    call dgesvd("S","S",m,n,Atmp%m,m,this%Sigma%v,this%U%m,m,this%V%m,min(m,n),work,lwork,info)
+    lwork = int(work(1))
+    deallocate(work)
+    allocate(work(lwork))
+    call dgesvd("S","S",m,n,Atmp%m,m,this%Sigma%v,this%U%m,m,this%V%m,min(m,n),work,lwork,info)
+    deallocate(work)
+  end subroutine DSVD
 end module LinAlgLib
